@@ -20,6 +20,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- SheetJS for Excel Export -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- ExcelJS: ekspor Excel RAB dengan format/warna/border -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <!-- docx for Word Generation -->
     <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
     <script>
@@ -339,6 +341,10 @@
                 <i data-lucide="wallet" class="w-5 h-5 text-champagneGold"></i>
                 <span>Pendapatan Sekolah</span>
             </button>
+            <button onclick="switchTab('rab')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-emerald-100 hover:bg-forestGreen/60 hover:text-white" data-target="rab">
+                <i data-lucide="clipboard-list" class="w-5 h-5 text-champagneGold"></i>
+                <span>RAB</span>
+            </button>
             <button onclick="switchTab('pengeluaran')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-emerald-100 hover:bg-forestGreen/60 hover:text-white" data-target="pengeluaran">
                 <i data-lucide="receipt" class="w-5 h-5 text-champagneGold"></i>
                 <span>Pengeluaran Sekolah</span>
@@ -612,6 +618,81 @@
                             <tbody id="tabel-pendapatan-body" class="divide-y divide-gray-100">
                                 <!-- Populated dynamically -->
                             </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- VIEW: RAB -->
+            <section id="view-rab" class="view-section space-y-6 hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-gradient-to-br from-emeraldDeep to-forestGreen text-white p-6 rounded-2xl shadow-sm space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs bg-champagneGold/30 text-champagneGold px-3 py-1 rounded-full font-semibold">Rencana Anggaran Belanja</span>
+                            <i data-lucide="clipboard-list" class="w-6 h-6 text-champagneGold"></i>
+                        </div>
+                        <h3 class="text-lg font-bold">Total Anggaran (RKAM)</h3>
+                        <h2 id="rab-total" class="text-3xl font-extrabold text-champagneGold">Rp 0</h2>
+                        <p class="text-xs text-emerald-100">Jumlah = Vol × Harga Satuan, dihitung otomatis. Data tersimpan otomatis setiap Anda mengetik.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-3 flex flex-col justify-center">
+                        <button onclick="rabExportExcel()" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-emerald-700 shadow transition flex items-center justify-center space-x-2">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Unduh Excel (RKAM)</span>
+                        </button>
+                        <button onclick="rabLoadSample()" class="w-full bg-softMint text-emeraldDeep py-2 rounded-xl font-semibold text-sm hover:bg-emerald-100 transition">Isi data RKAM 2026 (dari gambar)</button>
+                        <button onclick="rabClear()" class="w-full bg-gray-100 text-gray-600 py-2 rounded-xl font-semibold text-sm hover:bg-red-50 hover:text-red-600 transition">Kosongkan semua baris</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                    <h4 class="font-bold text-darkText flex items-center space-x-2"><i data-lucide="building-2" class="w-5 h-5 text-emeraldDeep"></i><span>Identitas &amp; Tanda Tangan (tampil di file Excel)</span></h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="sm:col-span-2"><label class="block text-xs font-semibold text-mutedText mb-1">Nama Madrasah</label><input type="text" id="rab-m-nama" oninput="rabMeta('nama',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">NSM</label><input type="text" id="rab-m-nsm" oninput="rabMeta('nsm',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Tahun Anggaran</label><input type="text" id="rab-m-ta" oninput="rabMeta('ta',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Desa/Kecamatan</label><input type="text" id="rab-m-desa" oninput="rabMeta('desa',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Kabupaten/Kota</label><input type="text" id="rab-m-kab" oninput="rabMeta('kab',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Provinsi</label><input type="text" id="rab-m-prov" oninput="rabMeta('prov',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Judul Kolom Tahap (angka)</label><input type="text" id="rab-m-tahap" oninput="rabMeta('tahap',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Tempat, Tanggal</label><input type="text" id="rab-m-tempat" oninput="rabMeta('tempat',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div class="sm:col-span-2"><label class="block text-xs font-semibold text-mutedText mb-1">Jabatan Kepala (kiri)</label><input type="text" id="rab-m-kepalaJabatan" oninput="rabMeta('kepalaJabatan',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Nama Kepala Madrasah</label><input type="text" id="rab-m-kepala" oninput="rabMeta('kepala',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Jabatan Bendahara (kanan)</label><input type="text" id="rab-m-bendaharaJabatan" oninput="rabMeta('bendaharaJabatan',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div><label class="block text-xs font-semibold text-mutedText mb-1">Nama Bendahara</label><input type="text" id="rab-m-bendahara" oninput="rabMeta('bendahara',this.value)" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep"></div>
+                        <div class="flex items-end"><label class="flex items-center space-x-2 text-sm text-darkText"><input type="checkbox" id="rab-m-itemBold" onchange="rabMeta('itemBold',this.checked)"><span>Teks detil belanja dicetak tebal di Excel</span></label></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                    <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-3">
+                        <h4 class="font-bold text-darkText">Rincian RAB</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="rabAdd('h')" class="bg-emeraldDeep text-white px-3 py-1.5 rounded-xl text-sm font-semibold hover:bg-forestGreen shadow flex items-center space-x-1.5"><i data-lucide="plus" class="w-4 h-4"></i><span>Program/Kegiatan (A, B, C…)</span></button>
+                            <button onclick="rabAdd('s')" class="bg-champagneGold text-emeraldDeep px-3 py-1.5 rounded-xl text-sm font-bold hover:bg-yellow-500 shadow flex items-center space-x-1.5"><i data-lucide="plus" class="w-4 h-4"></i><span>Sub Kegiatan</span></button>
+                            <button onclick="rabAdd('i')" class="bg-white border border-emeraldDeep text-emeraldDeep px-3 py-1.5 rounded-xl text-sm font-semibold hover:bg-softMint flex items-center space-x-1.5"><i data-lucide="plus" class="w-4 h-4"></i><span>Detil Belanja</span></button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-mutedText">Tombol <b>+</b> di ujung baris menyisipkan Detil Belanja tepat di bawah baris itu. Panah ▲▼ memindahkan baris.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm" style="min-width:980px">
+                            <thead class="bg-gray-50 text-mutedText text-xs uppercase font-semibold">
+                                <tr>
+                                    <th class="p-2 w-20">Jenis</th>
+                                    <th class="p-2 w-14">No.</th>
+                                    <th class="p-2 w-24">Kode</th>
+                                    <th class="p-2">Program/Kegiatan/Sub Kegiatan/Detil Belanja</th>
+                                    <th class="p-2 w-20 text-right">Vol</th>
+                                    <th class="p-2 w-24">Satuan</th>
+                                    <th class="p-2 w-32 text-right">Harga Satuan</th>
+                                    <th class="p-2 w-32 text-right">Jumlah (Rp)</th>
+                                    <th class="p-2 w-32 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rab-body" class="divide-y divide-gray-100"></tbody>
+                            <tfoot>
+                                <tr class="bg-emerald-50 font-bold text-emeraldDeep"><td colspan="7" class="p-3 text-center">JUMLAH</td><td id="rab-foot-total" class="p-3 text-right">0</td><td></td></tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -1231,6 +1312,7 @@
             const titles = {
                 beranda: "Beranda — Dashboard Keuangan",
                 pendapatan: "Pendapatan Sekolah & Realisasi",
+                rab: "RAB — Rencana Anggaran Belanja (RKAM)",
                 pengeluaran: "Pengeluaran Sekolah & Kuitansi",
                 laporan: "Laporan Keuangan Komprehensif",
                 kuitansi: "Arsip Data Kuitansi Resmi",
@@ -1243,6 +1325,7 @@
             if(tabId === 'laporan') generateLaporanPreview();
             if(tabId === 'pengaturan') fillSettingsForm();
             if(tabId === 'nota') initNotaView();
+            if(tabId === 'rab') renderRab();
         }
 
         function formatRupiah(num) {
@@ -2297,6 +2380,7 @@
                 cache.settings = snap.exists ? sj(snap.data()) : '';
                 onRemoteChange();
             }, onErr('config'));
+            try { initRabCloud(); } catch (e) { console.error(e); }
             window.addEventListener('offline', () => setSync('offline', 'Offline'));
             window.addEventListener('online', () => setSync('connecting', 'Menghubungkan…'));
         }
@@ -2338,6 +2422,255 @@
                 new MutationObserver(() => labelBody(tbody)).observe(tbody, { childList: true });
             });
         })();
+    </script>
+
+    <script>
+    // =====================  MODUL RAB / RKAM  =====================
+    const RAB_META_DEF = {
+        nama: "MTs Putri Hikmatusysyarief NWDI Salut", nsm: "121252010124", desa: "Narmada",
+        kab: "Lombok Barat", prov: "Nusa Tenggara Barat", ta: "2026", tahap: "1",
+        tempat: "Lombok Barat, 2 Maret 2026",
+        kepalaJabatan: "Kepala Madrasah Tsanawiyah Putri Hikmatusysyarief NWDI Salut",
+        kepala: "Fatmah, S.Pd.", bendaharaJabatan: "Bendahara Madrasah/BOS,", bendahara: "Hairurrayyan, S.Sos.",
+        itemBold: true
+    };
+    const RAB_SAMPLE = [["h", "A", "3.2.1", "Proses pembelajaran dilaksanakan dengan tepat", 0, "", 0], ["i", "", "", "Gaji/Honor rutin semua GBPNS", 6, "bulan", 11700000], ["i", "", "", "Gaji/ Honor rutin GTK/ Kepala Sekolah", 6, "bulan", 400000], ["i", "", "", "Gaji/ Honor rutin GTK/ TU", 6, "bulan", 250000], ["i", "", "", "Gaji/ Honor rutin GTK/ Bendahara", 6, "bulan", 250000], ["i", "", "", "Gaji/ Honor rutin GTK/ Operator", 6, "bulan", 250000], ["s", "", "", "Pelaksanaan Ujian Mdarasah (UM)", 0, "", 0], ["i", "", "", "Gaji/ Honor pengawas UM", 9, "hari", 100000], ["i", "", "", "Gaji/ Honor panitia UM", 7, "orang", 250000], ["s", "", "", "Pelaksanaan Penilaian Akhir Semester (PAS)", 0, "", 0], ["i", "", "", "Gaji/ Honor pengawas semester genap", 9, "hari", 140000], ["i", "", "", "Gaji/ Honor panitia semester genap", 7, "orang", 250000], ["s", "", "", "Pelaksanaan Tes Kemampuan Akademik (TKA)", 0, "", 0], ["i", "", "", "Gaji/ Honor pengawas", 1, "orang", 200000], ["i", "", "", "Gaji/ Honor panitia", 4, "orang", 250000], ["i", "", "", "Gaji/ Honor proktor", 1, "orang", 250000], ["i", "", "", "Gaji/ Honor teknis", 1, "orang", 250000], ["h", "B", "8.2.1", "Penyediaan beban Oprasional Madrasah", 0, "", 0], ["i", "", "", "HVS", 20, "rim", 50000], ["i", "", "", "VD/Buram", 4, "rim", 32000], ["i", "", "", "HVS Warna", 4, "rim", 75000], ["i", "", "", "Buffallow", 2, "rim", 33000], ["i", "", "", "Transparan", 2, "rim", 39000], ["i", "", "", "Amplop kecil", 5, "kotak", 20000], ["i", "", "", "Map soal", 2, "pack", 40000], ["i", "", "", "Tinta spidol", 2, "pack", 165000], ["i", "", "", "Tinta data print", 10, "buah", 100000], ["i", "", "", "Polpen", 5, "kotak", 25000], ["i", "", "", "Spidol besar", 4, "kotak", 90000], ["i", "", "", "Spidol kecil", 1, "pack", 20000], ["i", "", "", "Ordner", 10, "buah", 55000], ["i", "", "", "Gunting", 2, "buah", 7000], ["i", "", "", "Carter", 2, "buah", 13000], ["i", "", "", "Isi stepler", 5, "kotak", 15000], ["i", "", "", "lakban bening", 8, "buah", 12000], ["i", "", "", "Lakban hitam", 8, "buah", 12000], ["i", "", "", "Penghapus papan tulis", 1, "pack", 30000], ["i", "", "", "Cetak dan Penggandaan/ fotocopy soal dan lembar jawaban", 20860, "lembar", 300], ["i", "", "", "Air galon isi ulang", 15, "galon", 25000], ["i", "", "", "kabel", 100, "meter", 6000], ["i", "", "", "Alat peraga olahraga", 1, "paket", 2450000], ["i", "", "", "Obat-obatan", 1, "Paket", 1000000], ["i", "", "", "Materai 10.000", 50, "lembar", 12000], ["i", "", "", "Alat Kebersihan (Sapulidi, Pel, Sabun, dll)", 1, "Paket", 850000], ["i", "", "", "Konsumsi KBC (Kurikulum Berbasis Cinta)", 2, "hari", 500000], ["i", "", "", "Tikar spon plastik", 10, "buah", 50000], ["i", "", "", "Lampu LED", 1, "buah", 450000], ["i", "", "", "Stop kontak/kabel roll", 3, "buah", 150000], ["i", "", "", "Baterai remote/jam dinding", 10, "buah", 15000], ["i", "", "", "Hand sanitizer dan sabun cuci tangan", 1, "Paket", 200000], ["i", "", "", "Binder Clip berbagai ukuran", 10, "kotak", 20000], ["i", "", "", "Paper Clip", 10, "kotak", 10000], ["i", "", "", "Baterai AA/AAA", 20, "pasang", 15000], ["i", "", "", "Buku Inventaris", 2, "buah", 100000], ["i", "", "", "Tisu paseo smart", 1, "Dus", 400000], ["i", "", "", "Pewangi Ruangan", 10, "buah", 35000], ["i", "", "", "Keset", 12, "buah", 50000], ["h", "C", "6.2.3", "Penyediaan Sarana dan Prasarana Perpustakaan termasuk perpustakaan digital", 0, "", 0], ["i", "", "", "Pengadaan buku paket", 3, "kelas", 1450000], ["i", "", "", "Printer", 1, "buah", 2500000], ["i", "", "", "Internet Pascabayar", 6, "bulan", 380000], ["i", "", "", "Komputer", 2, "Buah", 6000000], ["i", "", "", "Mouse komputer kabel", 5, "buah", 80000], ["i", "", "", "Lampu", 11, "buah", 55000], ["i", "", "", "Sekat Kelas 7", 2, "buah", 1375000], ["i", "", "", "Pemeliharaan papan tulis", 7, "kelas", 300000], ["i", "", "", "Pemeliharaan komputer", 2, "buah", 650000], ["i", "", "", "Pemeliharaan meja bangku", 70, "buah", 50000], ["i", "", "", "Pengadaan lemari", 1, "buah", 2200000], ["i", "", "", "Papan Pengumuman/Mading (Sarana Informasi)", 2, "buah", 600000], ["i", "", "", "Mouse USB", 4, "buah", 75000], ["i", "", "", "Flashdisk 16 GB", 1, "buah", 73000]];
+    let _rabSeq = 0, _rabTimer = null, _rabWarned = false;
+
+    function rabInit() {
+        db.rab = db.rab || {};
+        db.rab.meta = Object.assign({}, RAB_META_DEF, db.rab.meta || {});
+        db.rab.rows = Array.isArray(db.rab.rows) ? db.rab.rows : [];
+    }
+    rabInit();
+
+    const rabEsc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    const rabNewId = () => 'rb' + Date.now().toString(36) + (++_rabSeq);
+    const rabJumlah = r => r.kind === 'i' ? (Number(r.vol) || 0) * (Number(r.harga) || 0) : 0;
+    const rabFmt = n => Number(n || 0).toLocaleString('id-ID');
+
+    function rabSave() {
+        db.rab.updatedAt = Date.now();
+        try { localStorage.setItem('sikma_db', JSON.stringify(db)); } catch (e) {}
+        clearTimeout(_rabTimer);
+        _rabTimer = setTimeout(pushRab, 800);
+    }
+    function pushRab() {
+        if (typeof fsdb === 'undefined' || !fsdb) return;
+        fsdb.collection('config').doc('rab').set({ json: JSON.stringify(db.rab), updatedAt: db.rab.updatedAt || 0 })
+            .catch(e => { console.error(e); if (!_rabWarned) { _rabWarned = true; showToast('RAB tersimpan di perangkat ini. Sinkron cloud ditolak: izinkan dokumen "config/rab" di Firestore Rules.'); } });
+    }
+    function initRabCloud() {
+        if (typeof fsdb === 'undefined' || !fsdb) return;
+        fsdb.collection('config').doc('rab').onSnapshot(snap => {
+            if (!snap.exists) { if (db.rab.rows.length) pushRab(); return; }
+            if (snap.metadata.hasPendingWrites) return;
+            const d = snap.data(), rt = d.updatedAt || 0, lt = db.rab.updatedAt || 0;
+            if (rt > lt) {
+                try {
+                    db.rab = JSON.parse(d.json); rabInit();
+                    localStorage.setItem('sikma_db', JSON.stringify(db));
+                    const v = document.getElementById('view-rab');
+                    if (v && !v.classList.contains('hidden') && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#view-rab'))) renderRab();
+                } catch (e) { console.error(e); }
+            } else if (rt < lt) pushRab();
+        }, e => console.error(e));
+    }
+
+    function fillRabMeta() {
+        const m = db.rab.meta;
+        Object.keys(m).forEach(k => {
+            const el = document.getElementById('rab-m-' + k); if (!el) return;
+            if (el.type === 'checkbox') el.checked = !!m[k]; else el.value = m[k];
+        });
+    }
+    function rabMeta(k, v) { db.rab.meta[k] = v; rabSave(); }
+
+    function rabRowHtml(r) {
+        const id = r.id, inp = 'w-full bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none';
+        const cell = (f, cls, ph, extra) => `<input type="text" value="${rabEsc(r[f])}" placeholder="${ph || ''}" oninput="rabEdit('${id}','${f}',this.value)" class="${inp} ${cls || ''}" ${extra || ''}>`;
+        const bg = r.kind === 'h' ? 'bg-emerald-50' : r.kind === 's' ? 'bg-gray-50' : '';
+        const badge = r.kind === 'h' ? '<span class="text-[10px] font-bold bg-emeraldDeep text-white px-2 py-0.5 rounded-full">Program</span>'
+                    : r.kind === 's' ? '<span class="text-[10px] font-bold bg-champagneGold text-emeraldDeep px-2 py-0.5 rounded-full">Sub</span>'
+                    : '<span class="text-[10px] font-semibold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Belanja</span>';
+        const isI = r.kind === 'i';
+        return `<tr class="${bg}" data-rid="${id}">
+            <td class="p-2">${badge}</td>
+            <td class="p-1">${r.kind === 'h' ? cell('no', 'text-center font-bold') : ''}</td>
+            <td class="p-1">${r.kind === 'h' ? cell('kode', '', '3.2.1') : ''}</td>
+            <td class="p-1">${cell('uraian', r.kind !== 'i' ? 'font-bold' : '', r.kind === 'h' ? 'Nama program/kegiatan' : r.kind === 's' ? 'Nama sub kegiatan' : 'Detil belanja')}</td>
+            <td class="p-1">${isI ? `<input type="number" step="any" min="0" value="${r.vol || ''}" oninput="rabEdit('${id}','vol',this.value)" class="${inp} text-right">` : ''}</td>
+            <td class="p-1">${isI ? cell('satuan', '', 'bulan') : ''}</td>
+            <td class="p-1">${isI ? `<input type="number" step="any" min="0" value="${r.harga || ''}" oninput="rabEdit('${id}','harga',this.value)" class="${inp} text-right">` : ''}</td>
+            <td class="p-2 text-right font-semibold ${r.kind === 'h' ? 'text-emeraldDeep' : ''}" id="rab-j-${id}"></td>
+            <td class="p-1 text-center whitespace-nowrap">
+                <button onclick="rabMove('${id}',-1)" title="Naik" class="px-1.5 text-gray-400 hover:text-emeraldDeep">▲</button>
+                <button onclick="rabMove('${id}',1)" title="Turun" class="px-1.5 text-gray-400 hover:text-emeraldDeep">▼</button>
+                <button onclick="rabAdd('i','${id}')" title="Sisipkan detil belanja di bawah" class="px-1.5 text-emeraldDeep font-bold hover:bg-softMint rounded">+</button>
+                <button onclick="rabDel('${id}')" title="Hapus" class="px-1.5 text-red-400 hover:text-red-600 font-bold">✕</button>
+            </td></tr>`;
+    }
+
+    function renderRab() {
+        rabInit(); fillRabMeta();
+        const tb = document.getElementById('rab-body');
+        tb.innerHTML = db.rab.rows.length ? db.rab.rows.map(rabRowHtml).join('')
+            : '<tr><td colspan="9" class="p-8 text-center text-mutedText text-sm">Belum ada data. Klik “+ Program/Kegiatan” untuk mulai, atau “Isi data RKAM 2026”.</td></tr>';
+        rabTotals();
+        lucide.createIcons();
+    }
+
+    function rabTotals() {
+        let total = 0, cur = null, sub = {};
+        db.rab.rows.forEach(r => {
+            if (r.kind === 'h') { cur = r.id; sub[cur] = 0; }
+            const j = rabJumlah(r); total += j;
+            if (r.kind === 'i') { const e = document.getElementById('rab-j-' + r.id); if (e) e.innerText = rabFmt(j); if (cur) sub[cur] += j; }
+        });
+        Object.keys(sub).forEach(id => { const e = document.getElementById('rab-j-' + id); if (e) e.innerText = rabFmt(sub[id]); });
+        db.rab.rows.forEach(r => { if (r.kind === 's') { const e = document.getElementById('rab-j-' + r.id); if (e) e.innerText = ''; } });
+        document.getElementById('rab-total').innerText = formatRupiah(total);
+        document.getElementById('rab-foot-total').innerText = rabFmt(total);
+    }
+
+    function rabEdit(id, f, v) {
+        const r = db.rab.rows.find(x => x.id === id); if (!r) return;
+        r[f] = (f === 'vol' || f === 'harga') ? (Number(v) || 0) : v;
+        if (f === 'vol' || f === 'harga') rabTotals();
+        rabSave();
+    }
+
+    function rabNextLetter() {
+        const used = db.rab.rows.filter(r => r.kind === 'h').map(r => String(r.no || '').trim().toUpperCase());
+        for (let i = 0; i < 26; i++) { const c = String.fromCharCode(65 + i); if (!used.includes(c)) return c; }
+        return '';
+    }
+
+    function rabAdd(kind, afterId) {
+        const r = { id: rabNewId(), kind, no: kind === 'h' ? rabNextLetter() : '', kode: '', uraian: '', vol: 0, satuan: '', harga: 0 };
+        const rows = db.rab.rows;
+        let idx = afterId ? rows.findIndex(x => x.id === afterId) + 1 : rows.length;
+        rows.splice(idx, 0, r);
+        rabSave(); renderRab();
+        const el = document.querySelector(`tr[data-rid="${r.id}"] input[oninput*="'uraian'"]`);
+        if (el) { el.focus(); el.scrollIntoView({ block: 'center' }); }
+    }
+
+    function rabMove(id, d) {
+        const rows = db.rab.rows, i = rows.findIndex(x => x.id === id), j = i + d;
+        if (i < 0 || j < 0 || j >= rows.length) return;
+        [rows[i], rows[j]] = [rows[j], rows[i]];
+        rabSave(); renderRab();
+    }
+
+    function rabDel(id) {
+        const r = db.rab.rows.find(x => x.id === id); if (!r) return;
+        konfirmasi('Hapus baris ini' + (r.uraian ? ' (“' + r.uraian + '”)' : '') + '?', () => {
+            db.rab.rows = db.rab.rows.filter(x => x.id !== id);
+            rabSave(); renderRab();
+        });
+    }
+
+    function rabClear() {
+        if (!db.rab.rows.length) return;
+        konfirmasi('Semua baris RAB akan dihapus. Lanjutkan?', () => { db.rab.rows = []; rabSave(); renderRab(); });
+    }
+
+    function rabLoadSample() {
+        const doLoad = () => {
+            db.rab.meta = Object.assign({}, RAB_META_DEF);
+            db.rab.rows = RAB_SAMPLE.map(a => ({ id: rabNewId(), kind: a[0], no: a[1], kode: a[2], uraian: a[3], vol: a[4], satuan: a[5], harga: a[6] }));
+            rabSave(); renderRab(); showToast('Data RKAM 2026 dimuat.');
+        };
+        if (db.rab.rows.length) konfirmasi('Baris RAB yang ada sekarang akan diganti dengan data RKAM 2026. Lanjutkan?', doLoad); else doLoad();
+    }
+
+    // ---------- EKSPOR EXCEL (format mengikuti RKAM) ----------
+    async function rabExportExcel() {
+        if (typeof ExcelJS === 'undefined') { showToast('Pustaka Excel belum termuat. Periksa koneksi internet lalu muat ulang.'); return; }
+        const m = db.rab.meta, rows = db.rab.rows;
+        if (!rows.length) { showToast('RAB masih kosong.'); return; }
+
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet('RKAM', { pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: .4, right: .4, top: .5, bottom: .5, header: .3, footer: .3 } } });
+        [8, 9, 100, 9, 12, 17, 18, 19].forEach((w, i) => ws.getColumn(i + 1).width = w);
+
+        const FONT = { name: 'Arial', size: 11 };
+        const GREEN = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6E0B4' } };
+        const thin = { style: 'thin', color: { argb: 'FF000000' } };
+        const BOX = { top: thin, left: thin, bottom: thin, right: thin };
+        const SIDES = { left: thin, right: thin };
+        const put = (addr, v, o) => { const c = ws.getCell(addr); c.value = v; c.font = Object.assign({}, FONT, (o && o.font) || {}); if (o && o.al) c.alignment = o.al; if (o && o.fill) c.fill = o.fill; if (o && o.border) c.border = o.border; if (o && o.fmt) c.numFmt = o.fmt; return c; };
+
+        // Judul
+        ws.mergeCells('A1:H1'); put('A1', 'RENCANA KEGIATAN DAN ANGGARAN MADRASAH (RKAM)', { font: { bold: true }, al: { horizontal: 'center', vertical: 'middle' } });
+        ws.mergeCells('A2:H2'); put('A2', 'TAHUN ANGGARAN ' + m.ta, { font: { bold: true }, al: { horizontal: 'center', vertical: 'middle' } });
+
+        // Identitas
+        [['Nama Madrasah', m.nama], ['NSM', m.nsm], ['Desa/Kecamatan', m.desa], ['Kabupaten/Kota', m.kab], ['Provinsi', m.prov]].forEach((p, i) => {
+            const r = 4 + i;
+            ws.mergeCells(`A${r}:B${r}`); put('A' + r, p[0], { font: { bold: true } });
+            put('C' + r, ': ' + p[1], { font: { bold: true }, al: { horizontal: 'left' } });
+        });
+
+        // Header tabel (baris 10-11)
+        ws.mergeCells('A10:B11'); ['C', 'D', 'E', 'F', 'G'].forEach(c => ws.mergeCells(`${c}10:${c}11`));
+        const H = { font: { bold: true }, fill: GREEN, border: BOX, al: { horizontal: 'center', vertical: 'middle', wrapText: true } };
+        put('A10', 'No. Kode', H); put('C10', 'Program/Kegiatan/Sub Kegiatan/Detil Belanja', H); put('D10', 'Vol', H);
+        put('E10', 'Satuan', H); put('F10', 'Harga Satuan', H); put('G10', 'Jumlah (Rp)', H); put('H10', 'Tahap', H);
+        put('H11', isNaN(Number(m.tahap)) || m.tahap === '' ? m.tahap : Number(m.tahap), H);
+        ['B10', 'B11', 'A11', 'C11', 'D11', 'E11', 'F11', 'G11'].forEach(a => { const c = ws.getCell(a); c.fill = GREEN; c.border = BOX; });
+        ws.getRow(10).height = 32; ws.getRow(11).height = 24;
+
+        // Isi
+        let r = 12; const first = r;
+        rows.forEach((x, idx) => {
+            if (x.kind === 'h' && idx > 0) { for (let c = 1; c <= 8; c++) ws.getCell(r, c).border = SIDES; r++; }
+            const bold = x.kind !== 'i' || m.itemBold;
+            if (x.kind === 'h') {
+                put('A' + r, x.no, { font: { bold: false }, al: { horizontal: 'center' }, border: BOX });
+                put('B' + r, x.kode, { al: { horizontal: 'right' }, border: BOX });
+            } else { put('A' + r, null, { border: BOX }); put('B' + r, null, { border: BOX }); }
+            put('C' + r, x.uraian, { font: { bold }, border: BOX });
+            if (x.kind === 'i') {
+                const v = Number(x.vol) || 0, h = Number(x.harga) || 0;
+                put('D' + r, v, { font: { bold }, al: { horizontal: 'center' }, border: BOX });
+                put('E' + r, x.satuan, { font: { bold }, al: { horizontal: 'center' }, border: BOX });
+                put('F' + r, h, { font: { bold }, border: BOX, fmt: '#,##0' });
+                put('G' + r, { formula: `D${r}*F${r}`, result: v * h }, { font: { bold }, border: BOX, fmt: '#,##0' });
+                put('H' + r, { formula: `G${r}`, result: v * h }, { font: { bold }, border: BOX, fmt: '#,##0' });
+            } else ['D', 'E', 'F', 'G', 'H'].forEach(c => put(c + r, null, { border: BOX }));
+            r++;
+        });
+        const last = r - 1;
+        for (let c = 1; c <= 8; c++) ws.getCell(r, c).border = SIDES; r++;   // baris kosong sebelum JUMLAH
+
+        // Total
+        const total = rows.reduce((a, x) => a + rabJumlah(x), 0);
+        ws.mergeCells(`A${r}:F${r}`);
+        put('A' + r, 'JUMLAH', { font: { bold: true }, fill: GREEN, border: BOX, al: { horizontal: 'center', vertical: 'middle' } });
+        for (let c = 2; c <= 6; c++) { const cc = ws.getCell(r, c); cc.fill = GREEN; cc.border = BOX; }
+        put('G' + r, { formula: `SUM(G${first}:G${last})`, result: total }, { font: { bold: true }, fill: GREEN, border: BOX, fmt: '#,##0' });
+        put('H' + r, { formula: `SUM(H${first}:H${last})`, result: total }, { font: { bold: true }, fill: GREEN, border: BOX, fmt: '#,##0' });
+        ws.getRow(r).height = 24;
+        r += 3;
+
+        // Tanda tangan
+        put('A' + r, 'Mengetahui :', {}); put('G' + r, m.tempat, {}); r++;
+        put('A' + r, m.kepalaJabatan, {}); put('G' + r, m.bendaharaJabatan, {});
+        r += 5;
+        put('A' + r, m.kepala, {}); put('G' + r, m.bendahara, {});
+
+        // Font default untuk sel kosong lain
+        ws.eachRow({ includeEmpty: false }, row => row.eachCell({ includeEmpty: false }, c => { if (!c.font || !c.font.name) c.font = FONT; }));
+        ws.pageSetup.printArea = `A1:H${r}`;
+
+        const buf = await wb.xlsx.writeBuffer();
+        const url = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+        const a = document.createElement('a'); a.href = url; a.download = `RKAM_${m.ta}_${(m.nama || 'Madrasah').replace(/[^\w]+/g, '_')}.xlsx`;
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+        showToast('File Excel RKAM berhasil diunduh!');
+    }
     </script>
 </body>
 </html>
