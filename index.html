@@ -177,7 +177,9 @@
         }
 
 
-        /* ===== NOTA TOKO ATK ===== */
+        #lpj-parent.lpj-active { background: rgba(255,255,255,.10); color: #fff; }
+        #lpj-sub .nav-btn.bg-forestGreen::before { left: -13px; }
+        /* ===== NOTA TOKO ===== */
         .n-page { position: relative; width: 794px; height: 1123px; overflow: hidden; transform-origin: top left; color: #111;
             background: linear-gradient(180deg, #A8EEF0 0%, #C9ECEF 22%, #D6E9EB 60%, #DDE3E3 100%);
             font-family: Arial, Helvetica, 'Liberation Sans', sans-serif; }
@@ -488,8 +490,25 @@
             </button>
             <button onclick="switchTab('nota')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-emerald-100 hover:bg-forestGreen/60 hover:text-white" data-target="nota">
                 <i data-lucide="shopping-bag" class="w-5 h-5 text-champagneGold"></i>
-                <span>Nota Toko ATK</span>
+                <span>Nota Toko</span>
             </button>
+            <div id="lpj-group">
+                <button type="button" id="lpj-parent" onclick="toggleLpjMenu()" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-emerald-100 hover:bg-forestGreen/60 hover:text-white" aria-expanded="false">
+                    <i data-lucide="folder-archive" class="w-5 h-5 text-champagneGold"></i>
+                    <span class="flex-1 text-left">LPJ</span>
+                    <i data-lucide="chevron-down" id="lpj-chevron" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <div id="lpj-sub" class="hidden mt-1.5 ml-5 pl-3 border-l border-white/15 space-y-1.5">
+                    <button onclick="switchTab('lpj-kuitansi')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-emerald-100 hover:bg-forestGreen/60 hover:text-white" data-target="lpj-kuitansi">
+                        <i data-lucide="file-badge" class="w-4 h-4 text-champagneGold"></i>
+                        <span>KWITANSI</span>
+                    </button>
+                    <button onclick="switchTab('lpj-nota')" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl transition text-emerald-100 hover:bg-forestGreen/60 hover:text-white" data-target="lpj-nota">
+                        <i data-lucide="shopping-bag" class="w-4 h-4 text-champagneGold"></i>
+                        <span>NOTA</span>
+                    </button>
+                </div>
+            </div>
             <button onclick="switchTab('pengaturan')" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition text-emerald-100 hover:bg-forestGreen/60 hover:text-white" data-target="pengaturan">
                 <i data-lucide="settings" class="w-5 h-5 text-champagneGold"></i>
                 <span>Pengaturan</span>
@@ -1019,7 +1038,64 @@
                 </div>
             </section>
 
-            <!-- VIEW 5b: NOTA TOKO ATK -->
+            <!-- VIEW LPJ: KWITANSI -->
+            <section id="view-lpj-kuitansi" class="view-section space-y-6 hidden fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div>
+                            <h4 class="font-bold text-darkText flex items-center space-x-2"><i data-lucide="file-badge" class="w-5 h-5 text-emeraldDeep"></i><span>LPJ — Kwitansi / Bukti Pengeluaran</span></h4>
+                            <p class="text-xs text-mutedText mt-1">Semua kuitansi pengeluaran digabung menjadi 1 file PDF (1 kuitansi per halaman A4), diurutkan menurut No. Bukti dari nomor terkecil sampai terakhir.</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+                            <select id="lpj-k-semester" onchange="renderLpjKuitansi()" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
+                                <option value="">Semua Semester</option>
+                                <option value="Ganjil">Semester Ganjil</option>
+                                <option value="Genap">Semester Genap</option>
+                            </select>
+                            <button id="lpj-k-btn" onclick="downloadLpjKuitansi()" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-700 shadow flex items-center justify-center space-x-2">
+                                <i data-lucide="file-down" class="w-4 h-4"></i><span id="lpj-k-btn-text">Download PDF Semua Kwitansi</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="lpj-k-progress" class="hidden"><div class="h-2 rounded-full bg-gray-100 overflow-hidden"><div id="lpj-k-bar" class="h-full w-0 bg-emerald-500 transition-all"></div></div><p id="lpj-k-status" class="text-xs text-mutedText mt-1">Memproses…</p></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-50 text-mutedText text-xs uppercase font-semibold">
+                                <tr><th class="p-3">Urutan</th><th class="p-3">No. Bukti</th><th class="p-3">Tanggal</th><th class="p-3">Uraian</th><th class="p-3">Penerima</th><th class="p-3">Nominal</th></tr>
+                            </thead>
+                            <tbody id="tabel-lpj-kuitansi-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                    <p id="lpj-k-total" class="text-sm font-bold text-darkText text-right"></p>
+                </div>
+            </section>
+
+            <!-- VIEW LPJ: NOTA -->
+            <section id="view-lpj-nota" class="view-section space-y-6 hidden fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div>
+                            <h4 class="font-bold text-darkText flex items-center space-x-2"><i data-lucide="shopping-bag" class="w-5 h-5 text-emeraldDeep"></i><span>LPJ — Nota Toko</span></h4>
+                            <p class="text-xs text-mutedText mt-1">Semua nota yang sudah disimpan digabung menjadi 1 file PDF (1 nota per halaman A4), diurutkan menurut nomor nota.</p>
+                        </div>
+                        <button id="lpj-n-btn" onclick="downloadLpjNota()" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-700 shadow flex items-center justify-center space-x-2">
+                            <i data-lucide="file-down" class="w-4 h-4"></i><span id="lpj-n-btn-text">Download PDF Semua Nota</span>
+                        </button>
+                    </div>
+                    <div id="lpj-n-progress" class="hidden"><div class="h-2 rounded-full bg-gray-100 overflow-hidden"><div id="lpj-n-bar" class="h-full w-0 bg-emerald-500 transition-all"></div></div><p id="lpj-n-status" class="text-xs text-mutedText mt-1">Memproses…</p></div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-50 text-mutedText text-xs uppercase font-semibold">
+                                <tr><th class="p-3">Urutan</th><th class="p-3">Nomor Nota</th><th class="p-3">Tanggal</th><th class="p-3">Barang</th><th class="p-3">Total</th></tr>
+                            </thead>
+                            <tbody id="tabel-lpj-nota-body" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                    <p id="lpj-n-total" class="text-sm font-bold text-darkText text-right"></p>
+                </div>
+            </section>
+
+            <!-- VIEW 5b: NOTA TOKO -->
             <section id="view-nota" class="view-section space-y-6 hidden fade-in">
                 <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
                     <!-- KOLOM KIRI: FORM -->
@@ -1235,14 +1311,14 @@
                     <span class="k" style="left:7.317%;top:36.207%">Sumber dana</span>
                     <span class="k" style="left:30.488%;top:36.207%">:</span>
                     <span class="k " id="k-sumber" style="left:33.171%;top:36.207%">Dana BOS</span>
-                    <span class="k k-center" style="left:81.5%;top:41.034%">Penerima</span>
-                    <span class="k k-center" id="k-penerima-bawah" style="left:81.5%;top:48.621%">RIDWAN HUMAIDI</span>
+                    <span class="k k-center" style="left:75%;top:41.034%">Penerima</span>
+                    <span class="k k-center" id="k-penerima-bawah" style="left:75%;top:48.621%">RIDWAN HUMAIDI</span>
                     <span class="k " style="left:9.756%;top:51.810%">Mengetahui</span>
                     <span class="k " style="left:9.756%;top:53.448%">Kepala Madrasah</span>
-                    <span class="k " id="k-tgl-lunas" style="left:65.854%;top:51.810%">Lunas dibayar tanggal, 15 Mei 2026</span>
-                    <span class="k " style="left:65.854%;top:53.448%">Bendahara Madrasah</span>
+                    <span class="k " id="k-tgl-lunas" style="left:58%;top:51.810%">Lunas dibayar tanggal, 15 Mei 2026</span>
+                    <span class="k " style="left:58%;top:53.448%">Bendahara Madrasah</span>
                     <span class="k " id="k-kamad" style="left:9.756%;top:61.034%">FATMAH, S.Pd</span>
-                    <span class="k " id="k-bendahara" style="left:65.854%;top:61.034%">HAIRURRAYYAN, S.Sos</span>
+                    <span class="k " id="k-bendahara" style="left:58%;top:61.034%">HAIRURRAYYAN, S.Sos</span>
                 </div>
             </div>
         </div>
@@ -1492,7 +1568,9 @@
                 pengeluaran: "Pengeluaran Sekolah & Kuitansi",
                 laporan: "Laporan Keuangan Komprehensif",
                 kuitansi: "Arsip Data Kuitansi Resmi",
-                nota: "Pembuatan Nota Toko ATK",
+                nota: "Pembuatan Nota Toko",
+                "lpj-kuitansi": "LPJ — Kuitansi / Bukti Pengeluaran",
+                "lpj-nota": "LPJ — Nota Toko",
                 pengaturan: "Pengaturan Identitas Madrasah"
             };
             document.getElementById('page-title').innerText = titles[tabId];
@@ -1502,6 +1580,9 @@
             if(tabId === 'pengaturan') fillSettingsForm();
             if(tabId === 'nota') initNotaView();
             if(tabId === 'rab') renderRab();
+            if(tabId === 'lpj-kuitansi') renderLpjKuitansi();
+            if(tabId === 'lpj-nota') renderLpjNota();
+            if(tabId.indexOf('lpj-') === 0) setLpjMenu(true, true); else document.getElementById('lpj-parent').classList.remove('lpj-active');
         }
 
         function formatRupiah(num) {
@@ -1582,6 +1663,8 @@
             renderPengeluaranTable();
             renderKuitansiTable();
             renderNotaTable();
+            renderLpjKuitansi();
+            renderLpjNota();
             renderRecentTransactions();
             if (window.__unlocked) {
                 if (!document.getElementById('view-beranda').classList.contains('hidden')) initCharts();
@@ -1832,11 +1915,7 @@
             if (!document.getElementById('modal-kuitansi').classList.contains('hidden')) fitKuitansiPreview();
         });
 
-        function openKuitansiModal(id) {
-            const x = db.pengeluaran.find(i => i.id === id);
-            if(!x) return;
-            currentActiveItem = x;
-
+        function fillKuitansiPage(x) {
             document.getElementById('k-ta').innerText = x.ta;
             document.getElementById('k-nobukti').innerText = x.nobukti;
             document.getElementById('k-penerima-atas').innerText = "Kepala Madrasah";
@@ -1852,6 +1931,14 @@
             document.getElementById('k-kamad').innerText = tanpaTitikAkhir(db.settings.kamad);
             document.getElementById('k-bendahara').innerText = tanpaTitikAkhir(db.settings.bendahara);
             document.getElementById('k-tgl-lunas').innerText = `Lunas dibayar tanggal, ${tglIndo(x.tanggal)}`;
+        }
+
+        function openKuitansiModal(id) {
+            const x = db.pengeluaran.find(i => i.id === id);
+            if(!x) return;
+            currentActiveItem = x;
+
+            fillKuitansiPage(x);
 
             document.body.classList.add('printing-kuitansi');
             document.getElementById('modal-kuitansi').classList.remove('hidden');
@@ -2372,6 +2459,149 @@
             } catch (e) { console.error(e); showToast('Gagal membuat file nota. Coba lagi.'); }
         }
 
+
+        // ====================================================================
+        //  LPJ  (gabungan semua kuitansi / nota -> 1 file PDF)
+        // ====================================================================
+        function setLpjMenu(open, active) {
+            const sub = document.getElementById('lpj-sub'), p = document.getElementById('lpj-parent'), ch = document.getElementById('lpj-chevron');
+            if (!sub) return;
+            sub.classList.toggle('hidden', !open);
+            p.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (ch) ch.style.transform = open ? 'rotate(180deg)' : '';
+            p.classList.toggle('lpj-active', !!active);
+        }
+        function toggleLpjMenu() {
+            const open = document.getElementById('lpj-sub').classList.contains('hidden');
+            setLpjMenu(open, document.getElementById('lpj-parent').classList.contains('lpj-active'));
+        }
+        // urut alami: angka di dalam teks dibandingkan sebagai angka (BOS/2 < BOS/10)
+        const lpjNat = (a, b) => String(a).localeCompare(String(b), 'id', { numeric: true, sensitivity: 'base' });
+        function lpjBuktiSeq(nb) { const p = String(nb || '').split('/'); for (let i = 0; i < p.length; i++) { if (/^\d+$/.test(p[i].trim())) return parseInt(p[i], 10); } return Infinity; }
+        function lpjKuitansiList() {
+            const sem = (document.getElementById('lpj-k-semester') || {}).value || '';
+            return (db.pengeluaran || []).filter(x => !sem || x.semester === sem)
+                .slice().sort((a, b) => (lpjBuktiSeq(a.nobukti) - lpjBuktiSeq(b.nobukti)) || lpjNat(a.nobukti, b.nobukti) || String(a.tanggal).localeCompare(String(b.tanggal)));
+        }
+        function lpjNotaList() {
+            return (db.nota || []).slice().sort((a, b) => lpjNat(a.nomor || '', b.nomor || '') || String(a.tanggal).localeCompare(String(b.tanggal)));
+        }
+        function renderLpjKuitansi() {
+            const tb = document.getElementById('tabel-lpj-kuitansi-body'); if (!tb) return;
+            const list = lpjKuitansiList();
+            if (!list.length) { tb.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-400">Belum ada kuitansi pengeluaran.</td></tr>'; document.getElementById('lpj-k-total').innerText = ''; return; }
+            tb.innerHTML = list.map((x, i) => `
+                <tr>
+                    <td class="p-3 text-xs">${i + 1}</td>
+                    <td class="p-3 font-mono font-bold text-emeraldDeep text-xs">${esc(x.nobukti)}</td>
+                    <td class="p-3 text-xs">${esc(x.tanggal)}</td>
+                    <td class="p-3 font-medium">${esc(x.nama)}</td>
+                    <td class="p-3 text-xs">${esc(x.penerima)}</td>
+                    <td class="p-3 font-bold text-red-600">${formatRupiah(x.nominal)}</td>
+                </tr>`).join('');
+            document.getElementById('lpj-k-total').innerText = `${list.length} kuitansi • Total ${formatRupiah(list.reduce((a, x) => a + Number(x.nominal || 0), 0))}`;
+        }
+        function renderLpjNota() {
+            const tb = document.getElementById('tabel-lpj-nota-body'); if (!tb) return;
+            const list = lpjNotaList();
+            if (!list.length) { tb.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Belum ada nota tersimpan. Buat dan simpan nota di menu Nota Toko.</td></tr>'; document.getElementById('lpj-n-total').innerText = ''; return; }
+            tb.innerHTML = list.map((n, i) => `
+                <tr>
+                    <td class="p-3 text-xs">${i + 1}</td>
+                    <td class="p-3 font-mono font-bold text-emeraldDeep text-xs">${esc(n.nomor || '-')}</td>
+                    <td class="p-3 text-xs">${esc(n.tanggal)}</td>
+                    <td class="p-3 text-xs">${esc(n.items.map(x => x.ket).join(', '))}</td>
+                    <td class="p-3 font-bold text-red-600">${formatRupiah(notaTotal(n))}</td>
+                </tr>`).join('');
+            document.getElementById('lpj-n-total').innerText = `${list.length} nota • Total ${formatRupiah(list.reduce((a, n) => a + notaTotal(n), 0))}`;
+        }
+
+        const lpjBusy = { k: false, n: false };
+        function lpjProgress(p, cur, tot, label) {
+            const box = document.getElementById(`lpj-${p}-progress`);
+            box.classList.remove('hidden');
+            document.getElementById(`lpj-${p}-bar`).style.width = Math.round(cur / tot * 100) + '%';
+            document.getElementById(`lpj-${p}-status`).innerText = `${label} ${cur} dari ${tot}…`;
+        }
+        function lpjFinish(p, defText) {
+            lpjBusy[p] = false;
+            const btn = document.getElementById(`lpj-${p}-btn`); btn.disabled = false; btn.classList.remove('opacity-60', 'cursor-not-allowed');
+            document.getElementById(`lpj-${p}-btn-text`).innerText = defText;
+            setTimeout(() => document.getElementById(`lpj-${p}-progress`).classList.add('hidden'), 1200);
+        }
+        function lpjStart(p) {
+            lpjBusy[p] = true;
+            const btn = document.getElementById(`lpj-${p}-btn`); btn.disabled = true; btn.classList.add('opacity-60', 'cursor-not-allowed');
+            document.getElementById(`lpj-${p}-btn-text`).innerText = 'Memproses…';
+        }
+        const lpjTick = () => new Promise(r => setTimeout(r, 30));
+
+        async function downloadLpjKuitansi() {
+            if (lpjBusy.k) return;
+            const list = lpjKuitansiList();
+            if (!list.length) { showToast('Belum ada kuitansi untuk diunduh.'); return; }
+            const DEF = 'Download PDF Semua Kwitansi';
+            lpjStart('k');
+            try {
+                if (document.fonts && document.fonts.ready) await document.fonts.ready;
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const keep = currentActiveItem;
+                for (let i = 0; i < list.length; i++) {
+                    lpjProgress('k', i + 1, list.length, 'Membuat kuitansi');
+                    await lpjTick();
+                    fillKuitansiPage(list[i]);
+                    const clone = document.getElementById('kuitansi-page').cloneNode(true);
+                    clone.removeAttribute('id');
+                    clone.style.cssText = 'position:fixed;left:-10000px;top:0;transform:none;';
+                    document.body.appendChild(clone);
+                    let canvas;
+                    try { canvas = await html2canvas(clone, { scale: 2, backgroundColor: '#ffffff' }); }
+                    finally { document.body.removeChild(clone); }
+                    if (i > 0) pdf.addPage('a4', 'p');
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+                }
+                currentActiveItem = keep;
+                const sem = (document.getElementById('lpj-k-semester') || {}).value;
+                pdf.save(`LPJ_Kwitansi${sem ? '_Semester-' + sem : ''}_${list[0].nobukti.replace(/[\/\\]+/g, '-')}_sd_${list[list.length - 1].nobukti.replace(/[\/\\]+/g, '-')}.pdf`);
+                showToast(`LPJ Kwitansi (${list.length} halaman) berhasil diunduh!`);
+            } catch (e) { console.error(e); showToast('Gagal membuat PDF kuitansi. Coba lagi.'); }
+            lpjFinish('k', DEF);
+        }
+
+        async function downloadLpjNota() {
+            if (lpjBusy.n) return;
+            const list = lpjNotaList();
+            if (!list.length) { showToast('Belum ada nota tersimpan untuk diunduh.'); return; }
+            const DEF = 'Download PDF Semua Nota';
+            lpjStart('n');
+            try {
+                if (document.fonts && document.fonts.ready) await document.fonts.ready;
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const logo = (db.settings && db.settings.nota && db.settings.nota.logo) || '';
+                for (let i = 0; i < list.length; i++) {
+                    lpjProgress('n', i + 1, list.length, 'Membuat nota');
+                    await lpjTick();
+                    const n = Object.assign({}, list[i]);
+                    if (!n.toko) { n.toko = notaToko(); delete n.toko.logo; }
+                    const page = document.createElement('div');
+                    page.className = 'n-page';
+                    page.style.cssText = 'position:fixed;left:-10000px;top:0;transform:none;';
+                    page.innerHTML = notaHtml(n, logo);
+                    document.body.appendChild(page);
+                    let canvas;
+                    try { canvas = await html2canvas(page, { scale: 2, backgroundColor: '#ffffff', useCORS: true }); }
+                    finally { document.body.removeChild(page); }
+                    if (i > 0) pdf.addPage('a4', 'p');
+                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+                }
+                pdf.save('LPJ_Nota_Toko.pdf');
+                showToast(`LPJ Nota (${list.length} halaman) berhasil diunduh!`);
+            } catch (e) { console.error(e); showToast('Gagal membuat PDF nota. Coba lagi.'); }
+            lpjFinish('n', DEF);
+        }
+
         let lgFails = 0, lgLockUntil = 0;
         async function sha256Hex(s) {
             const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
@@ -2580,7 +2810,7 @@
     <script>
         // Tabel -> kartu di HP: beri label kolom pada tiap sel (otomatis dari header tabel)
         (function () {
-            const ids = ['recent-transactions-body', 'tabel-pendapatan-body', 'tabel-pengeluaran-body', 'tabel-kuitansi-body', 'tabel-nota-body'];
+            const ids = ['recent-transactions-body', 'tabel-pendapatan-body', 'tabel-pengeluaran-body', 'tabel-kuitansi-body', 'tabel-nota-body', 'tabel-lpj-kuitansi-body', 'tabel-lpj-nota-body'];
             function labelBody(tbody) {
                 const table = tbody.closest('table');
                 const heads = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
