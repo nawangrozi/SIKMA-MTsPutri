@@ -387,6 +387,51 @@
             body.printing-kuitansi .k-page { transform: none !important; height: 296mm !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
+
+<style>
+/* ===== HEADER HP (rapi, 2 baris: judul + status sinkron) ===== */
+.t-short { display: none; }
+@media (max-width: 767px) {
+    header.hdr {
+        display: grid !important;
+        grid-template-columns: auto auto minmax(0,1fr) auto auto;
+        grid-template-areas: "menu logo title theme logout" "menu logo sync theme logout";
+        align-items: center; column-gap: .55rem; row-gap: 0;
+        height: 3.75rem !important; padding: 0 .75rem !important;
+        position: sticky; box-shadow: 0 1px 0 rgba(6,78,59,.06), 0 6px 16px -10px rgba(6,78,59,.35) !important;
+        padding-top: env(safe-area-inset-top, 0px);
+    }
+    header.hdr::after { content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px; background: linear-gradient(90deg,#064E3B 0%,#0A7A5A 55%,#D6B56D 100%); pointer-events:none; }
+    header.hdr .hdr-left, header.hdr .hdr-right, header.hdr .hdr-tools { display: contents !important; }
+    header.hdr .space-x-4 > *, header.hdr .space-x-3 > * { margin-left: 0 !important; }
+    header.hdr .hdr-tools { border: 0 !important; padding: 0 !important; }
+    header.hdr .hdr-right > .md\:flex, header.hdr .hdr-kamad, header.hdr .hdr-avatar { display: none !important; }
+
+    .hdr-menu, header.hdr .hdr-theme, header.hdr .hdr-logout {
+        width: 2.5rem; height: 2.5rem; min-height: 2.5rem !important; border-radius: .8rem;
+        display: inline-flex; align-items: center; justify-content: center; padding: 0 !important;
+        background: #ECFDF5; color: #064E3B; border: 1px solid #D5EFE2; transition: transform .15s, background .2s;
+    }
+    .hdr-menu:active, header.hdr .hdr-theme:active, header.hdr .hdr-logout:active { transform: scale(.93); }
+    .hdr-menu svg { width: 1.3rem; height: 1.3rem; }
+    header.hdr .hdr-logout { background: #FEF2F2; color: #B91C1C; border-color: #FBD5D5; }
+    .hdr-menu { grid-area: menu; } .hdr-theme { grid-area: theme; } .hdr-logout { grid-area: logout; }
+
+    #logo-header { grid-area: logo; height: 2.4rem !important; width: 2.4rem !important; }
+
+    #page-title { grid-area: title; align-self: end; max-width: none !important; min-width: 0;
+        font-size: 1.02rem !important; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; margin: 0; }
+    #page-title .t-full { display: none; } #page-title .t-short { display: inline; }
+
+    #sync-pill { grid-area: sync; align-self: start; justify-self: start; background: transparent !important; border: 0 !important;
+        padding: 0 !important; gap: .35rem; font-size: 11px; font-weight: 600; line-height: 1.2; margin-top: 2px; }
+    #sync-pill .txt { display: inline !important; }
+    #sync-pill .dot { width: 7px; height: 7px; }
+}
+html.dark .hdr-menu, html.dark header.hdr .hdr-theme { background: rgba(255,255,255,.07); color: #E5EFEA; border-color: rgba(255,255,255,.10); }
+html.dark header.hdr .hdr-theme { color: #E9C46A; }
+html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5A5; border-color: rgba(239,68,68,.28); }
+</style>
 </head>
 <body class="flex h-screen overflow-hidden">
     <script>
@@ -529,27 +574,27 @@
     <div class="flex-1 flex flex-col overflow-hidden">
         
         <!-- HEADER -->
-        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 shadow-sm">
-            <div class="flex items-center space-x-4">
-                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-emeraldDeep">
+        <header class="hdr bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 z-20 shadow-sm">
+            <div class="hdr-left flex items-center space-x-4">
+                <button onclick="toggleSidebar()" aria-label="Buka menu" class="hdr-menu text-gray-500 hover:text-emeraldDeep">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
                 <img id="logo-header" alt="Logo Lembaga" class="hidden h-10 w-10 object-contain" style="filter: drop-shadow(0 1px 3px rgba(0,0,0,.25))">
-                <h2 id="page-title" class="text-xl font-bold text-darkText">Beranda — Dashboard Keuangan</h2>
+                <h2 id="page-title" class="text-xl font-bold text-darkText"><span class="t-full">Beranda — Dashboard Keuangan</span><span class="t-short">Beranda</span></h2>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="hdr-right flex items-center space-x-4">
                 <div id="sync-pill" class="s-connecting" title="Status sinkronisasi data"><span class="dot"></span><span class="txt" id="sync-text">Menghubungkan…</span></div>
                 <div class="hidden md:flex items-center space-x-2 text-xs bg-softMint text-emeraldDeep px-3 py-1.5 rounded-full font-semibold border border-emerald-200">
                     <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
                     <span id="header-active-ta">Tahun Anggaran: 2026</span>
                 </div>
-                <div class="flex items-center space-x-3 border-l pl-4 border-gray-200">
-                    <button type="button" onclick="toggleTheme()" class="theme-toggle" title="Ganti mode terang/gelap" aria-label="Ganti mode terang/gelap">
+                <div class="hdr-tools flex items-center space-x-3 border-l pl-4 border-gray-200">
+                    <button type="button" onclick="toggleTheme()" class="theme-toggle hdr-theme" title="Ganti mode terang/gelap" aria-label="Ganti mode terang/gelap">
                         <span class="ic-moon"><i data-lucide="moon" class="w-5 h-5"></i></span>
                         <span class="ic-sun"><i data-lucide="sun" class="w-5 h-5"></i></span>
                     </button>
-                    <button onclick="logout()" title="Keluar" class="text-gray-500 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition"><i data-lucide="log-out" class="w-5 h-5"></i></button>
-                    <div class="w-9 h-9 rounded-full bg-emeraldDeep text-white flex items-center justify-center font-bold text-sm shadow">
+                    <button onclick="logout()" title="Keluar" aria-label="Keluar" class="hdr-logout text-gray-500 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+                    <div class="hdr-avatar w-9 h-9 rounded-full bg-emeraldDeep text-white hidden md:flex items-center justify-center font-bold text-sm shadow">
                         FM
                     </div>
                     <div class="hidden md:block text-left">
@@ -1573,7 +1618,16 @@
                 "lpj-nota": "LPJ — Nota Toko",
                 pengaturan: "Pengaturan Identitas Madrasah"
             };
-            document.getElementById('page-title').innerText = titles[tabId];
+            const shortTitles = {
+                beranda: "Beranda", pendapatan: "Pendapatan", rab: "RAB (RKAM)", pengeluaran: "Pengeluaran",
+                laporan: "Laporan Keuangan", kuitansi: "Arsip Kuitansi", nota: "Nota Toko",
+                "lpj-kuitansi": "LPJ Kuitansi", "lpj-nota": "LPJ Nota", pengaturan: "Pengaturan"
+            };
+            const _pt = document.getElementById('page-title');
+            _pt.innerHTML = '';
+            const _tf = document.createElement('span'); _tf.className = 't-full'; _tf.textContent = titles[tabId];
+            const _ts = document.createElement('span'); _ts.className = 't-short'; _ts.textContent = shortTitles[tabId] || titles[tabId];
+            _pt.appendChild(_tf); _pt.appendChild(_ts);
             
             if(tabId === 'beranda') initCharts();
             if(tabId === 'laporan') generateLaporanPreview();
