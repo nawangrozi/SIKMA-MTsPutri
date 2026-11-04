@@ -77,7 +77,49 @@
         main .bg-white.rounded-2xl { border-color: #E7EEEA; box-shadow: 0 1px 2px rgba(6,78,59,.04), 0 8px 24px -12px rgba(6,78,59,.12); transition: transform .2s ease, box-shadow .2s ease; }
         #view-beranda .grid > .bg-white.rounded-2xl:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -12px rgba(6,78,59,.25); }
         #view-beranda > div:first-child { background-image: linear-gradient(120deg,#064E3B 0%,#065F46 55%,#0A7A5A 100%), radial-gradient(circle at 90% 10%, rgba(214,181,109,.35), transparent 40%); position: relative; overflow: hidden; }
-        #view-beranda > div:first-child::after { content:''; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border-radius:50%; background: rgba(214,181,109,.18); }
+        /* === Hero Beranda: dua lingkaran (besar & kecil) menggelinding terus-menerus === */
+        #view-beranda > div:first-child > * { position: relative; z-index: 1; }
+        #view-beranda > div:first-child h3, #view-beranda > div:first-child p { text-shadow: 0 1px 10px rgba(2,44,34,.45); }
+        #view-beranda > div:first-child > .hero-roller { position: absolute; z-index: 0; left: 0; width: var(--rd); height: var(--rd); pointer-events: none;
+            --travel: 600px; --roll-deg: 900deg; animation: heroTravel var(--roll-time) ease-in-out infinite alternate; will-change: transform; }
+        .hero-roller.big   { --rd: 132px; --roll-time: 18s; top: 50%; margin-top: -66px; }
+        .hero-roller.small { --rd: 58px;  --roll-time: 11s; bottom: 12px; animation-direction: alternate-reverse; }
+        .hero-roller.small .hero-disc { animation-direction: alternate-reverse; }
+        .hero-disc { position: relative; width: 100%; height: 100%; border-radius: 50%;
+            background:
+                radial-gradient(circle, #F3E2A9 0 3.2%, rgba(214,181,109,.55) 4.5% 8%, transparent 9%),
+                repeating-conic-gradient(from 0deg, rgba(214,181,109,.30) 0 .9deg, transparent .9deg 30deg),
+                radial-gradient(circle at 32% 26%, rgba(255,255,255,.26), rgba(214,181,109,.13) 55%, rgba(214,181,109,.05));
+            box-shadow: inset 0 0 22px rgba(214,181,109,.22), 0 16px 36px -12px rgba(0,0,0,.55);
+            animation: heroSpin var(--roll-time) ease-in-out infinite alternate; will-change: transform; }
+        /* cincin emas bergradasi */
+        .hero-disc::before { content: ''; position: absolute; inset: 0; border-radius: 50%; padding: 3px;
+            background: conic-gradient(from 0deg, #D6B56D, rgba(214,181,109,.12) 24%, #F6E7B4 50%, rgba(214,181,109,.12) 76%, #D6B56D);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+        /* skala jam di cincin dalam */
+        .hero-disc::after { content: ''; position: absolute; inset: 13%; border-radius: 50%;
+            background: repeating-conic-gradient(from 0deg, rgba(255,255,255,.5) 0 1.4deg, transparent 1.4deg 15deg);
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px)); }
+        .hero-roller.small .hero-disc::before { padding: 2px; }
+        .hero-roller.small .hero-disc::after { inset: 14%; -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px)); mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px)); }
+        @keyframes heroTravel { from { transform: translateX(10px); } to { transform: translateX(var(--travel)); } }
+        @keyframes heroSpin   { from { transform: rotate(0deg); } to { transform: rotate(var(--roll-deg)); } }
+        @media (max-width: 767px) {
+            #view-beranda > div:first-child > .hero-roller { opacity: .7; }
+            .hero-roller.big   { --rd: 84px; --roll-time: 13s; top: 30%; margin-top: -42px; }
+            .hero-roller.small { --rd: 38px; --roll-time: 8s; top: 9px; bottom: auto; }
+        }
+        @media (prefers-reduced-motion: reduce) { .hero-roller, .hero-disc { animation: none !important; } #view-beranda > div:first-child > .hero-roller.big { left: auto; right: 16px; } .hero-roller.small { display: none; } }
+
+        /* === Mode Edit Pengeluaran === */
+        .edit-banner { display:flex; align-items:center; gap:.6rem; padding:.65rem .9rem; border-radius:.9rem; font-size:.8rem; font-weight:600; background:#FEF9E7; color:#7A5B00; border:1px solid #F1DE9A; }
+        .edit-banner.hidden { display:none; }
+        .edit-banner b { font-weight:800; }
+        html.dark .edit-banner { background: rgba(214,181,109,.12); color:#E9CF8C; border-color: rgba(214,181,109,.35); }
+        @keyframes editFlash { 0% { box-shadow: 0 0 0 0 rgba(214,181,109,.75); } 100% { box-shadow: 0 0 0 16px rgba(214,181,109,0); } }
+        .flash-edit { animation: editFlash .9s ease-out 2; border-color: #D6B56D !important; }
         #kpi-pendapatan,#kpi-pengeluaran,#kpi-saldo,#kpi-realisasi { font-family:'Plus Jakarta Sans',sans-serif; font-size:1.65rem; font-weight:800; letter-spacing:-.02em; line-height:1.1; }
         .kpi-bar { height:6px; background:#EEF2F0; border-radius:99px; overflow:hidden; margin-top:8px; }
         .kpi-bar > div { height:100%; width:0; border-radius:99px; background: linear-gradient(90deg,#10B981,#D6B56D); transition: width 1s cubic-bezier(.2,.8,.2,1); }
@@ -617,6 +659,8 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             <!-- VIEW 1: BERANDA -->
             <section id="view-beranda" class="view-section space-y-6 fade-in">
                 <div class="bg-gradient-to-r from-emeraldDeep to-forestGreen rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div class="hero-roller big" aria-hidden="true"><div class="hero-disc"></div></div>
+                    <div class="hero-roller small" aria-hidden="true"><div class="hero-disc"></div></div>
                     <div class="flex items-center gap-5 relative z-10">
                         <div id="logo-hero-box" class="hidden w-24 h-24 shrink-0"><img id="logo-hero" alt="Logo Lembaga" class="w-full h-full object-contain" style="filter: drop-shadow(0 6px 14px rgba(0,0,0,.4))"></div>
                     <div>
@@ -897,13 +941,17 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
 
             <!-- VIEW 3: PENGELUARAN SEKOLAH -->
             <section id="view-pengeluaran" class="view-section space-y-6 hidden fade-in">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                <div id="card-form-pengeluaran" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
                     <h4 class="font-bold text-darkText flex items-center space-x-2">
                         <i data-lucide="receipt" class="w-5 h-5 text-emeraldDeep"></i>
                         <span>Formulir Pencatatan Pengeluaran & Pembuatan Kuitansi</span>
                     </h4>
                     <form id="form-pengeluaran" onsubmit="savePengeluaran(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <input type="hidden" id="pengeluaran-id">
+                        <div id="exp-edit-banner" class="edit-banner hidden sm:col-span-2 lg:col-span-3">
+                            <i data-lucide="pencil" class="w-4 h-4 shrink-0"></i>
+                            <span>Mode Edit — sedang mengubah: <b id="exp-edit-name"></b>. Tekan <b>Batal</b> untuk keluar dari mode edit.</span>
+                        </div>
                         <div>
                             <label class="block text-xs font-semibold text-mutedText mb-1">Nama Barang / Uraian Pembayaran</label>
                             <input type="text" id="exp-nama" placeholder="Contoh: Pembelian Flashdisk" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep">
@@ -959,7 +1007,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                         </div>
                         <div class="sm:col-span-2 lg:col-span-3 form-actions">
                             <button type="submit" class="btn-simpan bg-emeraldDeep text-white rounded-xl font-bold hover:bg-forestGreen transition">
-                                <i data-lucide="receipt" class="w-5 h-5 shrink-0"></i><span>Simpan &amp; Buat Kuitansi</span>
+                                <i data-lucide="receipt" class="w-5 h-5 shrink-0"></i><span id="exp-submit-label">Simpan &amp; Buat Kuitansi</span>
                             </button>
                             <button type="button" onclick="resetPengeluaranForm()" class="btn-batal bg-gray-100 text-gray-600 rounded-xl font-semibold hover:bg-gray-200 transition">Batal</button>
                         </div>
@@ -1819,7 +1867,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             document.getElementById('pen-semester').value = x.semester;
             document.getElementById('pen-ta').value = x.ta;
             document.getElementById('pen-ket').value = x.ket || '';
-            window.scrollTo({top: 0, behavior: 'smooth'});
+            scrollKeAtas();
         }
 
         function deletePendapatan(id) {
@@ -1922,22 +1970,81 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             });
         }
 
+        // Hero Beranda: sesuaikan jarak gelinding & jumlah putaran tiap lingkaran dengan lebar kartu (agar terlihat menggelinding sungguhan)
+        (function initHeroRoller() {
+            const hero = document.querySelector('#view-beranda > div:first-child');
+            const rollers = hero ? hero.querySelectorAll('.hero-roller') : [];
+            if (!hero || !rollers.length) return;
+            const update = () => {
+                const w = hero.clientWidth; if (!w) return;
+                rollers.forEach(r => {
+                    const d = r.offsetWidth || 100;
+                    const travel = Math.max(0, w - d - 20);
+                    r.style.setProperty('--travel', travel + 'px');
+                    r.style.setProperty('--roll-deg', (travel / (d / 2) * 180 / Math.PI).toFixed(1) + 'deg');
+                });
+            };
+            if (window.ResizeObserver) new ResizeObserver(update).observe(hero);
+            window.addEventListener('resize', update);
+            update();
+        })();
+
+        function scrollKeAtas() {
+            // Area gulir halaman ini adalah <main>, bukan window -> harus di-scroll lewat <main>
+            const m = document.querySelector('main');
+            if (m) m.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setSelectValue(el, val) {
+            if (!el) return;
+            val = (val === undefined || val === null) ? '' : String(val);
+            if (val && ![...el.options].some(o => o.value === val)) {
+                el.add(new Option(val, val));   // nilai lama yang tidak ada di daftar tetap dipertahankan
+            }
+            el.value = val;
+        }
+
+        function setModeEditPengeluaran(aktif, nama) {
+            const b = document.getElementById('exp-edit-banner');
+            const l = document.getElementById('exp-submit-label');
+            if (!b || !l) return;
+            if (aktif) {
+                document.getElementById('exp-edit-name').textContent = nama || '';
+                b.classList.remove('hidden');
+                l.innerHTML = 'Simpan Perubahan &amp; Kuitansi';
+            } else {
+                b.classList.add('hidden');
+                l.innerHTML = 'Simpan &amp; Buat Kuitansi';
+            }
+        }
+
         function editPengeluaran(id) {
-            const x = db.pengeluaran.find(i => i.id === id);
-            if(!x) return;
+            const x = db.pengeluaran.find(i => String(i.id) === String(id));
+            if (!x) { showToast('Data pengeluaran tidak ditemukan.'); return; }
+
+            switchTab('pengeluaran');   // tampilkan halaman dulu agar form terlihat
+
             document.getElementById('pengeluaran-id').value = x.id;
-            document.getElementById('exp-nama').value = x.nama;
+            document.getElementById('exp-nama').value = x.nama || '';
             document.getElementById('exp-nominal').value = x.nominal;
-            document.getElementById('exp-tanggal').value = x.tanggal;
-            document.getElementById('exp-penerima').value = x.penerima;
-            document.getElementById('exp-nobukti').value = x.nobukti;
-            document.getElementById('exp-sumber').value = x.sumber;
-            document.getElementById('exp-kategori').value = x.kategori;
-            document.getElementById('exp-semester').value = x.semester;
-            document.getElementById('exp-ta').value = x.ta;
+            document.getElementById('exp-tanggal').value = x.tanggal || '';
+            document.getElementById('exp-penerima').value = x.penerima || '';
+            document.getElementById('exp-nobukti').value = x.nobukti || '';
+            setSelectValue(document.getElementById('exp-sumber'), x.sumber);
+            setSelectValue(document.getElementById('exp-kategori'), x.kategori);
+            setSelectValue(document.getElementById('exp-semester'), x.semester);
+            document.getElementById('exp-ta').value = x.ta || '';
             document.getElementById('exp-ket').value = x.ket || '';
-            switchTab('pengeluaran');
-            window.scrollTo({top: 0, behavior: 'smooth'});
+
+            setModeEditPengeluaran(true, x.nama);
+            if (window.lucide) lucide.createIcons();
+
+            scrollKeAtas();
+            const card = document.getElementById('card-form-pengeluaran');
+            if (card) { card.classList.remove('flash-edit'); void card.offsetWidth; card.classList.add('flash-edit'); }
+            setTimeout(() => { const f = document.getElementById('exp-nama'); if (f) f.focus({ preventScroll: true }); }, 450);
+            showToast('Mode edit: ubah data lalu tekan "Simpan Perubahan".');
         }
 
         function deletePengeluaran(id) {
@@ -1951,6 +2058,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         function resetPengeluaranForm() {
             document.getElementById('form-pengeluaran').reset();
             document.getElementById('pengeluaran-id').value = '';
+            setModeEditPengeluaran(false);
             document.getElementById('exp-tanggal').valueAsDate = new Date();
             document.getElementById('exp-nobukti').value = db.settings.formatBukti;
         }
