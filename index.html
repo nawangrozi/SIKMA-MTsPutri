@@ -300,7 +300,7 @@
         #sync-pill.s-error { color: #B91C1C; background: #FEF2F2; border-color: #FECACA; }
         @keyframes lgBlink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
         @media (max-width: 767px) { #sync-pill .txt { display: none; } #sync-pill { padding: .45rem; } }
-        @media print { #confirm-box, #sidebar-overlay { display:none !important; } }
+        @media print { #confirm-box, #sidebar-overlay, #periode-bar { display:none !important; } }
         /* ===== TOMBOL AKSI FORM PENGELUARAN (Simpan lebih besar dari Batal) ===== */
         .form-actions { display: flex; align-items: stretch; gap: .75rem; }
         .form-actions .btn-simpan { flex: 2.6 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: .6rem;
@@ -331,7 +331,7 @@
                --s-mint:#ECFDF5; --s-accent:#064E3B; --s-accent2:#047857; --s-red:#DC2626; --s-thead:#F1F6F3; --s-even:#FAFCFB; --s-hover:#ECFDF5; --s-primary:#064E3B; --s-primary-h:#065F46; }
         html.dark { color-scheme: dark;
                --s-bg:#09110E; --s-1:#101C17; --s-2:#15251E; --s-3:#1B2E26; --s-line:#27403A; --s-line2:#1F332C; --s-text:#E8F2ED; --s-muted:#95AAA1;
-               --s-mint:#10302A; --s-accent:#4ADE9F; --s-accent2:#34D399; --s-red:#F87171; --s-thead:#16271F; --s-even:#12201A; --s-hover:#183429; --s-primary:#0B7A5A; --s-primary-h:#0E9370; }
+               --s-mint:#10302A; --s-accent:#7BF0C4; --s-accent2:#5FE3AE; --s-red:#F87171; --s-thead:#16271F; --s-even:#12201A; --s-hover:#183429; --s-primary:#0B7A5A; --s-primary-h:#0E9370; }
         /* area dokumen (kertas) tetap terang agar sama dengan hasil cetak/PDF */
         html.dark #laporan-preview-container, html.dark #k-scale-box, html.dark #nota-scale-box {
                --s-1:#fff; --s-2:#F9FAFB; --s-3:#F3F4F6; --s-line:#E5E7EB; --s-line2:#F3F4F6; --s-text:#172B25; --s-muted:#6B7C75;
@@ -359,6 +359,12 @@
         html.dark .text-mutedText, html.dark .text-gray-400, html.dark .text-gray-500, html.dark .text-gray-600, html.dark .text-gray-700 { color: var(--s-muted) !important; }
         html.dark .text-emeraldDeep, html.dark .hover\:text-emeraldDeep:hover { color: var(--s-accent) !important; }
         html.dark .text-emerald-600, html.dark .text-emerald-700 { color: var(--s-accent2) !important; }
+        /* Tombol/label berlatar emas: teks hijau gelap (bukan hijau terang) supaya kontras jelas di mode gelap */
+        html.dark .bg-champagneGold.text-emeraldDeep, html.dark .bg-champagneGold .text-emeraldDeep { color: #04261C !important; }
+        html.dark .bg-champagneGold { background-color: #E2C27A !important; }
+        html.dark .bg-champagneGold:hover, html.dark .hover\:bg-yellow-500:hover { background-color: #F0D58F !important; }
+        /* Teks kode bukti (monospace) di tabel: tebal & terang agar mudah dibaca */
+        html.dark .font-mono.text-emeraldDeep { color: #8FF5CF !important; letter-spacing: .02em; }
         html.dark .text-red-600, html.dark .hover\:text-red-600:hover, html.dark .hover\:text-red-800:hover { color: var(--s-red) !important; }
         html.dark .text-blue-600, html.dark .hover\:text-blue-800:hover { color: #60A5FA !important; }
         html.dark .text-yellow-600, html.dark .text-yellow-700 { color: #FBBF24 !important; }
@@ -604,7 +610,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         <div class="p-4 border-t border-forestGreen text-xs text-emerald-200 flex items-center justify-between">
             <div>
                 <p class="font-semibold text-white" id="sidebar-user-role">Administrator</p>
-                <p class="text-[10px] opacity-75">T.A. 2026 • Semester Ganjil</p>
+                <p class="text-[10px] opacity-75" id="sidebar-ta-info">T.A. 2026 • Tahap 1</p>
             </div>
             <button onclick="confirmSample()" title="Muat Data Uji Sampel" class="bg-champagneGold text-emeraldDeep p-2 rounded-lg hover:bg-yellow-500 transition font-bold shadow">
                 <i data-lucide="database" class="w-4 h-4"></i>
@@ -650,6 +656,20 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         <!-- VIEW CONTAINER -->
         <main class="flex-1 overflow-y-auto p-6 relative">
             
+            <!-- BAR PERIODE -->
+            <div id="periode-bar" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <span class="text-xs font-bold text-emeraldDeep uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="calendar-range" class="w-4 h-4"></i><span>Periode Data</span></span>
+                    <select id="periode-ta" onchange="setPeriode()" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none"></select>
+                    <select id="periode-tahap" onchange="setPeriode()" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none">
+                        <option value="">Semua Tahap</option>
+                        <option value="1">Tahap 1</option>
+                        <option value="2">Tahap 2</option>
+                    </select>
+                </div>
+                <p id="periode-info" class="text-xs text-mutedText"></p>
+            </div>
+
             <!-- TOAST NOTIFICATION -->
             <div id="toast" class="fixed top-20 right-6 z-50 transform translate-y-[-20px] opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 bg-emeraldDeep text-white px-5 py-3 rounded-xl shadow-xl">
                 <i data-lucide="check-circle-2" class="w-5 h-5 text-champagneGold"></i>
@@ -722,7 +742,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2 space-y-4">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-darkText">Grafik Arus Keuangan & Anggaran</h4>
-                            <span class="text-xs text-mutedText bg-gray-100 px-2.5 py-1 rounded-lg">Tahun Anggaran 2026</span>
+                            <span id="chart-periode-label" class="text-xs text-mutedText bg-gray-100 px-2.5 py-1 rounded-lg">Tahun Anggaran 2026</span>
                         </div>
                         <div class="h-72"><canvas id="financeChart"></canvas></div>
                     </div>
@@ -810,10 +830,10 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                             <input type="number" id="pen-nominal" placeholder="0" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-mutedText mb-1">Semester</label>
+                            <label class="block text-xs font-semibold text-mutedText mb-1">Tahap Dana BOS</label>
                             <select id="pen-semester" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep">
-                                <option value="Ganjil">Semester Ganjil</option>
-                                <option value="Genap">Semester Genap</option>
+                                <option value="Ganjil">Tahap 1</option>
+                                <option value="Genap">Tahap 2</option>
                             </select>
                         </div>
                         <div>
@@ -851,7 +871,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                                     <th class="p-3">Tanggal</th>
                                     <th class="p-3">Sumber Pendapatan</th>
                                     <th class="p-3">Uraian</th>
-                                    <th class="p-3">Semester / T.A.</th>
+                                    <th class="p-3">Tahap / T.A.</th>
                                     <th class="p-3 text-right">Nominal</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
@@ -873,7 +893,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                             <span class="text-xs bg-champagneGold/30 text-champagneGold px-3 py-1 rounded-full font-semibold">Rencana Anggaran Belanja</span>
                             <i data-lucide="clipboard-list" class="w-6 h-6 text-champagneGold"></i>
                         </div>
-                        <h3 class="text-lg font-bold">Total Anggaran (RKAM)</h3>
+                        <h3 class="text-lg font-bold">Total Anggaran (RKAM) — Tahun <span id="rab-year-label"></span></h3>
                         <h2 id="rab-total" class="text-3xl font-extrabold text-champagneGold">Rp 0</h2>
                         <p class="text-xs text-emerald-100">Jumlah = Vol × Harga Satuan, dihitung otomatis. Data tersimpan otomatis setiap Anda mengetik.</p>
                     </div>
@@ -881,6 +901,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                         <button onclick="rabExportExcel()" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-emerald-700 shadow transition flex items-center justify-center space-x-2">
                             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i><span>Unduh Excel (RKAM)</span>
                         </button>
+                        <button onclick="rabCopyPrev()" class="w-full bg-softMint text-emeraldDeep py-2 rounded-xl font-semibold text-sm hover:bg-emerald-100 transition">Salin RAB dari tahun sebelumnya</button>
                         <button onclick="rabLoadSample()" class="w-full bg-softMint text-emeraldDeep py-2 rounded-xl font-semibold text-sm hover:bg-emerald-100 transition">Isi data RKAM 2026 (dari gambar)</button>
                         <button onclick="rabClear()" class="w-full bg-gray-100 text-gray-600 py-2 rounded-xl font-semibold text-sm hover:bg-red-50 hover:text-red-600 transition">Kosongkan semua baris</button>
                     </div>
@@ -991,10 +1012,10 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-mutedText mb-1">Semester</label>
+                            <label class="block text-xs font-semibold text-mutedText mb-1">Tahap Dana BOS</label>
                             <select id="exp-semester" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emeraldDeep">
-                                <option value="Ganjil">Semester Ganjil</option>
-                                <option value="Genap">Semester Genap</option>
+                                <option value="Ganjil">Tahap 1</option>
+                                <option value="Genap">Tahap 2</option>
                             </select>
                         </div>
                         <div>
@@ -1069,7 +1090,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                             <h2 class="font-bold text-xl uppercase tracking-wider" id="rep-madrasah">MTs. PUTRI HIKMATUSYSYARIEF NWDI SALUT</h2>
                             <p class="text-xs text-gray-600" id="rep-alamat">Desa Selat, Kecamatan Narmada, Kabupaten Lombok Barat, Nusa Tenggara Barat</p>
                             <h3 id="rep-judul" class="font-bold text-md uppercase mt-3 underline">LAPORAN REALISASI ANGARAN KEUANGAN</h3>
-                            <p class="text-xs text-gray-500">Tahun Anggaran: <span id="rep-ta">2026</span> • Semester: <span id="rep-semester">Semua / Ganjil</span></p>
+                            <p class="text-xs text-gray-500">Tahun Anggaran: <span id="rep-ta">2026</span> • Tahap: <span id="rep-semester">Semua</span></p>
                         </div>
                         <div id="rep-content-body" class="space-y-4">
                             <!-- Populated report content -->
@@ -1141,9 +1162,9 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                         </div>
                         <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
                             <select id="lpj-k-semester" onchange="renderLpjKuitansi()" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none">
-                                <option value="">Semua Semester</option>
-                                <option value="Ganjil">Semester Ganjil</option>
-                                <option value="Genap">Semester Genap</option>
+                                <option value="">Semua Tahap</option>
+                                <option value="Ganjil">Tahap 1</option>
+                                <option value="Genap">Tahap 2</option>
                             </select>
                             <button id="lpj-k-btn" onclick="downloadLpjKuitansi()" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-700 shadow flex items-center justify-center space-x-2">
                                 <i data-lucide="file-down" class="w-4 h-4"></i><span id="lpj-k-btn-text">Download PDF Semua Kwitansi</span>
@@ -1326,14 +1347,14 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                             <input type="text" id="set-bendahara" value="HAIRURRAYYAN, S.Sos." required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-mutedText mb-1">Tahun Anggaran Aktif</label>
+                            <label class="block text-xs font-semibold text-mutedText mb-1">Tahun Anggaran Aktif (default form)</label>
                             <input type="text" id="set-ta" value="2026" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-mutedText mb-1">Semester Aktif</label>
+                            <label class="block text-xs font-semibold text-mutedText mb-1">Tahap Aktif (default form)</label>
                             <select id="set-semester" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm">
-                                <option value="Ganjil">Semester Ganjil</option>
-                                <option value="Genap">Semester Genap</option>
+                                <option value="Ganjil">Tahap 1</option>
+                                <option value="Genap">Tahap 2</option>
                             </select>
                         </div>
                         <div>
@@ -1344,6 +1365,36 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                             <button type="submit" class="bg-emeraldDeep text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-forestGreen shadow transition">Simpan Pengaturan</button>
                         </div>
                     </form>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+                    <h3 class="text-lg font-bold text-darkText flex items-center space-x-2">
+                        <i data-lucide="arrow-right-left" class="w-5 h-5 text-emeraldDeep"></i>
+                        <span>Pindahkan Data Antar Tahap</span>
+                    </h3>
+                    <p class="text-xs text-mutedText">Memindahkan seluruh pendapatan, pengeluaran, dan nota pada satu Tahun Anggaran dari satu tahap ke tahap lain. Data tidak dihapus, hanya diubah tahapnya.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-mutedText mb-1">Tahun Anggaran</label>
+                            <select id="mv-ta" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-mutedText mb-1">Dari</label>
+                            <select id="mv-dari" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm">
+                                <option value="1">Tahap 1</option><option value="2">Tahap 2</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-mutedText mb-1">Ke</label>
+                            <select id="mv-ke" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm">
+                                <option value="2" selected>Tahap 2</option><option value="1">Tahap 1</option>
+                            </select>
+                        </div>
+                    </div>
+                    <label class="flex items-center space-x-2 text-sm text-darkText"><input type="checkbox" id="mv-bukti"><span>Ubah juga kode tahap pada No. Bukti (contoh: BOS/091/T1/2026 menjadi BOS/091/T2/2026)</span></label>
+                    <div class="flex justify-end">
+                        <button type="button" onclick="pindahTahap()" class="bg-champagneGold text-emeraldDeep px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-yellow-500 shadow transition">Pindahkan Data</button>
+                    </div>
                 </div>
             </section>
 
@@ -1454,6 +1505,84 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         };
 
         db.nota = db.nota || [];
+
+        // ====================================================================
+        //  PERIODE: Tahun Anggaran + Tahap Dana BOS (Tahap 1 = Ganjil, Tahap 2 = Genap)
+        //  Semua data tetap tersimpan permanen; periode hanya memilih data yang DITAMPILKAN.
+        // ====================================================================
+        const TAHAP_SEM = { '1': 'Ganjil', '2': 'Genap' };
+        let periodeView = (function () { try { return JSON.parse(localStorage.getItem('sikma_view')) || {}; } catch (e) { return {}; } })();
+        function activeTA() { return String((db.settings && db.settings.ta) || new Date().getFullYear()); }
+        function viewTA() { return periodeView.ta === undefined ? activeTA() : String(periodeView.ta); }   // '' = semua tahun
+        function viewTahap() { return periodeView.tahap || ''; }                                          // '' = semua tahap
+        function semByDate(iso) { const m = parseInt(String(iso || '').slice(5, 7), 10); return m > 6 ? 'Genap' : 'Ganjil'; }
+        function notaTA(n) { return String(n.ta || String(n.tanggal || '').slice(0, 4)); }
+        function notaSem(n) { return n.semester || semByDate(n.tanggal); }
+        function inView(ta, sem) {
+            const t = viewTA(), h = viewTahap();
+            if (t && String(ta) !== t) return false;
+            if (h && sem !== TAHAP_SEM[h]) return false;
+            return true;
+        }
+        function vPen() { return db.pendapatan.filter(x => inView(x.ta, x.semester)); }
+        function vExp() { return db.pengeluaran.filter(x => inView(x.ta, x.semester)); }
+        function vNota() { return (db.nota || []).filter(n => inView(notaTA(n), notaSem(n))); }
+        function periodeLabel() { const t = viewTA(), h = viewTahap(); return (t ? 'T.A. ' + t : 'Semua Tahun') + ' • ' + (h ? 'Tahap ' + h : 'Semua Tahap'); }
+        function periodeSlug() { const t = viewTA(), h = viewTahap(); return (t || 'SemuaTahun') + (h ? '_Tahap' + h : ''); }
+        function semOfView() { return viewTahap() ? TAHAP_SEM[viewTahap()] : ((db.settings && db.settings.semester) || 'Ganjil'); }
+        function taOfView() { return viewTA() || activeTA(); }
+        function buktiDefault() {
+            let f = (db.settings && db.settings.formatBukti) || 'BOS/091/T1/2026';
+            const t = viewTahap() || (semOfView() === 'Genap' ? '2' : '1');
+            return f.replace(/T[12]\b/, 'T' + t).replace(/\b20\d\d\b/, taOfView());
+        }
+        function applyFormDefaults() {
+            const set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
+            if (!document.getElementById('pendapatan-id').value) { set('pen-ta', taOfView()); set('pen-semester', semOfView()); }
+            if (!document.getElementById('pengeluaran-id').value) { set('exp-ta', taOfView()); set('exp-semester', semOfView()); set('exp-nobukti', buktiDefault()); }
+        }
+        function saldoBawaan() {
+            const t = viewTA(); if (!t) return null;
+            const start = Number(t) * 2 + (viewTahap() === '2' ? 1 : 0);
+            if (isNaN(start)) return null;
+            const idx = x => Number(x.ta) * 2 + (x.semester === 'Genap' ? 1 : 0);
+            const pen = db.pendapatan.filter(x => idx(x) < start).reduce((a, b) => a + Number(b.nominal), 0);
+            const exp = db.pengeluaran.filter(x => idx(x) < start).reduce((a, b) => a + Number(b.nominal), 0);
+            return pen - exp;
+        }
+        function periodeYears() {
+            const set = {};
+            db.pendapatan.forEach(x => x.ta && (set[String(x.ta)] = 1));
+            db.pengeluaran.forEach(x => x.ta && (set[String(x.ta)] = 1));
+            (db.nota || []).forEach(n => { const y = notaTA(n); if (/^\d{4}$/.test(y)) set[y] = 1; });
+            Object.keys(db.rabYears || {}).forEach(y => { if ((db.rabYears[y].rows || []).length) set[y] = 1; });
+            const a = Number(activeTA());
+            set[activeTA()] = 1; if (!isNaN(a)) { set[String(a + 1)] = 1; set[String(a + 2)] = 1; }
+            set['2028'] = 1;
+            if (viewTA()) set[viewTA()] = 1;
+            return Object.keys(set).sort().reverse();
+        }
+        function renderPeriodeBar() {
+            const sel = document.getElementById('periode-ta'); if (!sel) return;
+            sel.innerHTML = '<option value="">Semua Tahun</option>' + periodeYears().map(y => `<option value="${y}">Tahun Anggaran ${y}</option>`).join('');
+            sel.value = viewTA();
+            document.getElementById('periode-tahap').value = viewTahap();
+            const sb = saldoBawaan();
+            document.getElementById('periode-info').innerHTML =
+                `<b>${vPen().length}</b> pendapatan • <b>${vExp().length}</b> pengeluaran • <b>${vNota().length}</b> nota` +
+                (sb === null ? '' : `<br class="md:hidden"><span class="md:ml-3">Saldo bawaan dari periode sebelumnya: <b class="${sb < 0 ? 'text-red-600' : 'text-emeraldDeep'}">${formatRupiah(sb)}</b></span>`);
+        }
+        function setPeriode() {
+            periodeView = { ta: document.getElementById('periode-ta').value, tahap: document.getElementById('periode-tahap').value };
+            try { localStorage.setItem('sikma_view', JSON.stringify(periodeView)); } catch (e) {}
+            applyFormDefaults();
+            updateDashboard();
+            const r = document.getElementById('view-rab'); if (r && !r.classList.contains('hidden')) renderRab();
+            showToast('Menampilkan data ' + periodeLabel());
+        }
+        function periodeNotice(ta, sem) {
+            if (!inView(ta, sem)) showToast(`Tersimpan di T.A. ${ta} • Tahap ${sem === 'Genap' ? 2 : 1}. Ubah Periode di atas untuk melihatnya.`);
+        }
         (function(){ const e = document.getElementById('lg-logo-img'); if (e) e.src = DEFAULT_LOGO; })();
         let currentActiveItem = null;
         let charts = {};
@@ -1623,6 +1752,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
 
         function konfirmasi(msg, onYes) {
             document.getElementById('confirm-msg').innerText = msg;
+            document.querySelector('#confirm-box .card h4').innerText = 'Konfirmasi Hapus'; document.getElementById('confirm-ok').innerText = 'Ya, Hapus';
             document.getElementById('confirm-ok').onclick = () => { closeConfirm(); onYes(); };
             document.getElementById('confirm-box').classList.add('show');
             lucide.createIcons();
@@ -1731,7 +1861,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                 formatBukti: "BOS/091/T1/2026"
             };
             db.pendapatan = [
-                { id: 'p1', tanggal: '2026-05-01', sumber: 'Dana BOS', uraian: 'Penerimaan Dana BOS Semester Ganjil 2026', nominal: 15000000, semester: 'Ganjil', ta: '2026', ket: 'Tahap 1' }
+                { id: 'p1', tanggal: '2026-05-01', sumber: 'Dana BOS', uraian: 'Penerimaan Dana BOS Tahap 1 2026', nominal: 15000000, semester: 'Ganjil', ta: '2026', ket: 'Tahap 1' }
             ];
             db.pengeluaran = [
                 { id: 'e1', nama: 'Flashdisk', nominal: 73000, tanggal: '2026-05-15', penerima: 'RIDWAN HUMAIDI', nobukti: 'BOS/091/T1/2026', sumber: 'Dana BOS', kategori: 'Alat Tulis Kantor & Perlengkapan', semester: 'Ganjil', ta: '2026', ket: 'ATK' }
@@ -1741,12 +1871,15 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         }
 
         function updateDashboard() {
-            document.getElementById('header-active-ta').innerText = `Tahun Anggaran: ${db.settings.ta}`;
+            document.getElementById('header-active-ta').innerText = periodeLabel();
+            const _si = document.getElementById('sidebar-ta-info'); if (_si) _si.innerText = 'T.A. ' + taOfView() + ' • Tahap ' + (semOfView() === 'Genap' ? 2 : 1);
+            const cpl = document.getElementById('chart-periode-label'); if (cpl) cpl.innerText = periodeLabel();
+            renderPeriodeBar();
             document.getElementById('header-kamad').innerText = db.settings.kamad;
             applyLogo();
             
-            const totalPen = db.pendapatan.reduce((a, b) => a + Number(b.nominal), 0);
-            const totalExp = db.pengeluaran.reduce((a, b) => a + Number(b.nominal), 0);
+            const totalPen = vPen().reduce((a, b) => a + Number(b.nominal), 0);
+            const totalExp = vExp().reduce((a, b) => a + Number(b.nominal), 0);
             const saldo = totalPen - totalExp;
             const realisasi = totalPen > 0 ? ((totalExp / totalPen) * 100).toFixed(1) : 0;
 
@@ -1779,8 +1912,8 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             tbody.innerHTML = '';
             
             let all = [
-                ...db.pendapatan.map(x => ({...x, type: 'Pendapatan', label: x.uraian, cat: x.sumber, color: 'text-emerald-600' })),
-                ...db.pengeluaran.map(x => ({...x, type: 'Pengeluaran', label: x.nama, cat: x.kategori, color: 'text-red-600' }))
+                ...vPen().map(x => ({...x, type: 'Pendapatan', label: x.uraian, cat: x.sumber, color: 'text-emerald-600' })),
+                ...vExp().map(x => ({...x, type: 'Pengeluaran', label: x.nama, cat: x.kategori, color: 'text-red-600' }))
             ].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal)).slice(0, 5);
 
             if(all.length === 0) {
@@ -1824,6 +1957,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                 showToast("Pendapatan berhasil disimpan!");
             }
             saveDb();
+            periodeNotice(item.ta, item.semester);
             resetPendapatanForm();
         }
 
@@ -1832,7 +1966,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             const q = document.getElementById('search-pendapatan').value.toLowerCase();
             tbody.innerHTML = '';
 
-            const filtered = db.pendapatan.filter(x => x.uraian.toLowerCase().includes(q) || x.sumber.toLowerCase().includes(q));
+            const filtered = vPen().filter(x => x.uraian.toLowerCase().includes(q) || x.sumber.toLowerCase().includes(q));
             if(filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-400">Tidak ada data pendapatan.</td></tr>`;
                 return;
@@ -1845,7 +1979,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                         <td class="p-3 text-xs">${x.tanggal}</td>
                         <td class="p-3 font-semibold text-emeraldDeep">${x.sumber}</td>
                         <td class="p-3">${x.uraian}</td>
-                        <td class="p-3 text-xs">Sem. ${x.semester} / ${x.ta}</td>
+                        <td class="p-3 text-xs">Tahap ${x.semester === 'Genap' ? 2 : 1} / ${x.ta}</td>
                         <td class="p-3 text-right font-bold text-emerald-600">${formatRupiah(x.nominal)}</td>
                         <td class="p-3 text-center space-x-2">
                             <button onclick="editPendapatan('${x.id}')" class="text-blue-600 hover:text-blue-800 text-xs font-semibold">Edit</button>
@@ -1882,6 +2016,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             document.getElementById('form-pendapatan').reset();
             document.getElementById('pendapatan-id').value = '';
             document.getElementById('pen-tanggal').valueAsDate = new Date();
+            applyFormDefaults();
         }
 
         function savePengeluaran(e) {
@@ -1910,8 +2045,16 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                 showToast("Pengeluaran disimpan & kuitansi dibuat!");
             }
             saveDb();
+            periodeNotice(item.ta, item.semester);
             resetPengeluaranForm();
             openKuitansiModal(item.id);
+        }
+
+        // Urut berdasarkan No. Bukti: terkecil di atas, terbesar di bawah (angka dibandingkan numerik: 002 < 010)
+        function urutNoBukti(arr) {
+            return arr.slice().sort((a, b) =>
+                String(a.nobukti || '').localeCompare(String(b.nobukti || ''), 'id', { numeric: true, sensitivity: 'base' })
+                || String(a.tanggal || '').localeCompare(String(b.tanggal || '')));
         }
 
         function renderPengeluaranTable() {
@@ -1919,7 +2062,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             const q = document.getElementById('search-pengeluaran').value.toLowerCase();
             tbody.innerHTML = '';
 
-            const filtered = db.pengeluaran.filter(x => x.nama.toLowerCase().includes(q) || x.penerima.toLowerCase().includes(q));
+            const filtered = urutNoBukti(vExp().filter(x => x.nama.toLowerCase().includes(q) || x.penerima.toLowerCase().includes(q)));
             if(filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">Tidak ada data pengeluaran.</td></tr>`;
                 return;
@@ -1948,7 +2091,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             const q = document.getElementById('search-kuitansi').value.toLowerCase();
             tbody.innerHTML = '';
 
-            const filtered = db.pengeluaran.filter(x => x.nobukti.toLowerCase().includes(q) || x.penerima.toLowerCase().includes(q) || x.nama.toLowerCase().includes(q));
+            const filtered = urutNoBukti(vExp().filter(x => x.nobukti.toLowerCase().includes(q) || x.penerima.toLowerCase().includes(q) || x.nama.toLowerCase().includes(q)));
             if(filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">Arsip kuitansi kosong.</td></tr>`;
                 return;
@@ -2060,7 +2203,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             document.getElementById('pengeluaran-id').value = '';
             setModeEditPengeluaran(false);
             document.getElementById('exp-tanggal').valueAsDate = new Date();
-            document.getElementById('exp-nobukti').value = db.settings.formatBukti;
+            applyFormDefaults();
         }
 
         function fitKuitansiPreview() {
@@ -2125,7 +2268,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-                pdf.save(`Kwitansi_${currentActiveItem.nobukti.replace(/\//g, '-')}_2026.pdf`);
+                pdf.save(`Kwitansi_${currentActiveItem.nobukti.replace(/\//g, '-')}_${currentActiveItem.ta}.pdf`);
                 showToast("Kuitansi PDF berhasil diunduh!");
             }).catch(() => { if (clone.parentNode) document.body.removeChild(clone); });
         }
@@ -2201,7 +2344,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Kwitansi_${currentActiveItem.nobukti.replace(/\//g, '-')}_2026.docx`;
+                a.download = `Kwitansi_${currentActiveItem.nobukti.replace(/\//g, '-')}_${currentActiveItem.ta}.docx`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -2213,15 +2356,15 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             const jenis = document.getElementById('laporan-jenis').value;
             document.getElementById('rep-madrasah').innerText = db.settings.madrasah;
             document.getElementById('rep-alamat').innerText = `Desa ${db.settings.desa}, Kecamatan Narmada, Kabupaten ${db.settings.kabupaten}, ${db.settings.provinsi}`;
-            document.getElementById('rep-ta').innerText = db.settings.ta;
-            document.getElementById('rep-semester').innerText = db.settings.semester;
+            document.getElementById('rep-ta').innerText = viewTA() || 'Semua Tahun';
+            document.getElementById('rep-semester').innerText = viewTahap() ? `Tahap ${viewTahap()}` : 'Tahap 1 & 2';
             document.getElementById('rep-kamad').innerText = db.settings.kamad;
             document.getElementById('rep-bendahara').innerText = db.settings.bendahara;
             document.getElementById('rep-tanggal-cetak').innerText = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
 
             const body = document.getElementById('rep-content-body');
-            const totalPen = db.pendapatan.reduce((a, b) => a + Number(b.nominal), 0);
-            const totalExp = db.pengeluaran.reduce((a, b) => a + Number(b.nominal), 0);
+            const totalPen = vPen().reduce((a, b) => a + Number(b.nominal), 0);
+            const totalExp = vExp().reduce((a, b) => a + Number(b.nominal), 0);
             const saldo = totalPen - totalExp;
             const realisasi = totalPen > 0 ? ((totalExp / totalPen) * 100).toFixed(1) : 0;
 
@@ -2238,7 +2381,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                 `;
             } else if(jenis === 'pendapatan') {
                 document.getElementById('rep-judul').innerText = "LAPORAN RINCIAN PENDAPATAN SEKOLAH";
-                let rows = db.pendapatan.map((x, i) => `<tr><td class="border p-2">${i+1}</td><td class="border p-2">${x.tanggal}</td><td class="border p-2">${x.sumber}</td><td class="border p-2">${x.uraian}</td><td class="border p-2 text-right">${formatRupiah(x.nominal)}</td></tr>`).join('');
+                let rows = vPen().map((x, i) => `<tr><td class="border p-2">${i+1}</td><td class="border p-2">${x.tanggal}</td><td class="border p-2">${x.sumber}</td><td class="border p-2">${x.uraian}</td><td class="border p-2 text-right">${formatRupiah(x.nominal)}</td></tr>`).join('');
                 body.innerHTML = `
                     <table class="w-full text-left text-sm border-collapse border border-gray-300">
                         <tr class="bg-gray-100 font-bold"><th class="border p-2">No</th><th class="border p-2">Tanggal</th><th class="border p-2">Sumber</th><th class="border p-2">Uraian</th><th class="border p-2 text-right">Nominal</th></tr>
@@ -2248,7 +2391,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                 `;
             } else {
                 document.getElementById('rep-judul').innerText = "LAPORAN RINCIAN PENGELUARAN SEKOLAH";
-                let rows = db.pengeluaran.map((x, i) => `<tr><td class="border p-2">${i+1}</td><td class="border p-2">${x.tanggal}</td><td class="border p-2">${x.nama}</td><td class="border p-2">${x.penerima} (${x.nobukti})</td><td class="border p-2 text-right">${formatRupiah(x.nominal)}</td></tr>`).join('');
+                let rows = vExp().map((x, i) => `<tr><td class="border p-2">${i+1}</td><td class="border p-2">${x.tanggal}</td><td class="border p-2">${x.nama}</td><td class="border p-2">${x.penerima} (${x.nobukti})</td><td class="border p-2 text-right">${formatRupiah(x.nominal)}</td></tr>`).join('');
                 body.innerHTML = `
                     <table class="w-full text-left text-sm border-collapse border border-gray-300">
                         <tr class="bg-gray-100 font-bold"><th class="border p-2">No</th><th class="border p-2">Tanggal</th><th class="border p-2">Uraian Barang</th><th class="border p-2">Penerima & Bukti</th><th class="border p-2 text-right">Nominal</th></tr>
@@ -2262,19 +2405,19 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         function exportToExcel(type) {
             let data = [];
             if(type === 'pendapatan') {
-                data = db.pendapatan.map(x => ({ Tanggal: x.tanggal, Sumber: x.sumber, Uraian: x.uraian, Nominal: x.nominal, Semester: x.semester, 'Tahun Anggaran': x.ta }));
+                data = vPen().map(x => ({ Tanggal: x.tanggal, Sumber: x.sumber, Uraian: x.uraian, Nominal: x.nominal, Semester: x.semester, 'Tahun Anggaran': x.ta }));
             } else if(type === 'pengeluaran') {
-                data = db.pengeluaran.map(x => ({ Tanggal: x.tanggal, Uraian: x.nama, Nominal: x.nominal, Penerima: x.penerima, 'No. Bukti': x.nobukti, 'Sumber Dana': x.sumber, Kategori: x.kategori }));
+                data = vExp().map(x => ({ Tanggal: x.tanggal, Uraian: x.nama, Nominal: x.nominal, Penerima: x.penerima, 'No. Bukti': x.nobukti, 'Sumber Dana': x.sumber, Kategori: x.kategori }));
             } else {
                 data = [
-                    { Keterangan: 'Total Pendapatan', Jumlah: db.pendapatan.reduce((a,b)=>a+b.nominal,0) },
-                    { Keterangan: 'Total Pengeluaran', Jumlah: db.pengeluaran.reduce((a,b)=>a+b.nominal,0) }
+                    { Keterangan: 'Total Pendapatan', Jumlah: vPen().reduce((a,b)=>a+b.nominal,0) },
+                    { Keterangan: 'Total Pengeluaran', Jumlah: vExp().reduce((a,b)=>a+b.nominal,0) }
                 ];
             }
             const worksheet = XLSX.utils.json_to_sheet(data);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan SIKMA");
-            XLSX.writeFile(workbook, `SIKMA_${type}_2026.xlsx`);
+            XLSX.writeFile(workbook, `SIKMA_${type}_${periodeSlug()}.xlsx`);
             showToast("File Excel berhasil diekspor!");
         }
 
@@ -2302,8 +2445,8 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             if(charts.fin) charts.fin.destroy();
             if(charts.cat) charts.cat.destroy();
 
-            const totalPen = db.pendapatan.reduce((a, b) => a + Number(b.nominal), 0);
-            const totalExp = db.pengeluaran.reduce((a, b) => a + Number(b.nominal), 0);
+            const totalPen = vPen().reduce((a, b) => a + Number(b.nominal), 0);
+            const totalExp = vExp().reduce((a, b) => a + Number(b.nominal), 0);
 
             const g = ctx1.createLinearGradient(0, 0, 0, 300);
             g.addColorStop(0, '#10B981'); g.addColorStop(1, '#064E3B');
@@ -2334,7 +2477,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             });
 
             let catMap = {};
-            db.pengeluaran.forEach(x => { catMap[x.kategori] = (catMap[x.kategori] || 0) + x.nominal; });
+            vExp().forEach(x => { catMap[x.kategori] = (catMap[x.kategori] || 0) + x.nominal; });
             const has = Object.keys(catMap).length > 0;
 
             charts.cat = new Chart(ctx2, {
@@ -2425,7 +2568,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             }
             renderNotaPreview();
         }
-        function nextNotaNo() { return 'NT-' + String((db.nota || []).length + 1).padStart(3, '0'); }
+        function nextNotaNo() { return 'NT-' + String(vNota().length + 1).padStart(3, '0'); }
 
         function renderNotaItems() {
             const ic = 'w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm';
@@ -2546,12 +2689,16 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             if (!n.tanggal) { showToast('Tanggal nota wajib diisi.'); return; }
             if (!n.items.length || n.items.some(x => !x.ket)) { showToast('Isi nama dan harga barang terlebih dahulu.'); return; }
             n.id = notaEditId || 'nota_' + Date.now();
+            const oldN = notaEditId ? db.nota.find(x => x.id === notaEditId) : null;
+            n.ta = oldN ? notaTA(oldN) : (viewTA() || String(n.tanggal).slice(0, 4));
+            n.semester = oldN ? notaSem(oldN) : (viewTahap() ? TAHAP_SEM[viewTahap()] : semByDate(n.tanggal));
             const idx = db.nota.findIndex(x => x.id === n.id);
             if (idx !== -1) db.nota[idx] = n; else db.nota.push(n);
             notaEditId = n.id; notaTokoSnap = n.toko;
             document.getElementById('nf-heading').innerText = 'Edit Nota ' + (n.nomor || '');
             saveDb();
             showToast('Nota berhasil disimpan! Silakan unduh JPG / PDF.');
+            periodeNotice(n.ta, n.semester);
         }
         function loadNota(id, quiet) {
             const n = db.nota.find(x => x.id === id);
@@ -2574,7 +2721,7 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         function renderNotaTable() {
             const tbody = document.getElementById('tabel-nota-body');
             if (!tbody) return;
-            const list = (db.nota || []).slice().sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)) || String(b.id).localeCompare(String(a.id)));
+            const list = vNota().slice().sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)) || String(b.id).localeCompare(String(a.id)));
             if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-400">Belum ada nota tersimpan.</td></tr>'; return; }
             tbody.innerHTML = list.map((n, i) => `
                 <tr>
@@ -2642,11 +2789,11 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         function lpjBuktiSeq(nb) { const p = String(nb || '').split('/'); for (let i = 0; i < p.length; i++) { if (/^\d+$/.test(p[i].trim())) return parseInt(p[i], 10); } return Infinity; }
         function lpjKuitansiList() {
             const sem = (document.getElementById('lpj-k-semester') || {}).value || '';
-            return (db.pengeluaran || []).filter(x => !sem || x.semester === sem)
+            return vExp().filter(x => !sem || x.semester === sem)
                 .slice().sort((a, b) => (lpjBuktiSeq(a.nobukti) - lpjBuktiSeq(b.nobukti)) || lpjNat(a.nobukti, b.nobukti) || String(a.tanggal).localeCompare(String(b.tanggal)));
         }
         function lpjNotaList() {
-            return (db.nota || []).slice().sort((a, b) => lpjNat(a.nomor || '', b.nomor || '') || String(a.tanggal).localeCompare(String(b.tanggal)));
+            return vNota().slice().sort((a, b) => lpjNat(a.nomor || '', b.nomor || '') || String(a.tanggal).localeCompare(String(b.tanggal)));
         }
         function renderLpjKuitansi() {
             const tb = document.getElementById('tabel-lpj-kuitansi-body'); if (!tb) return;
@@ -2823,11 +2970,45 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             document.body.classList.remove('locked');
             window.__unlocked = true;
             fillSettingsForm();
-            document.getElementById('exp-nobukti').value = (db.settings && db.settings.formatBukti) || 'BOS/091/T1/2026';
+            applyFormDefaults();
             switchTab('beranda');
             lucide.createIcons();
         }
+
+        function fillMoveForm() {
+            const sel = document.getElementById('mv-ta'); if (!sel) return;
+            const cur = sel.value || taOfView();
+            sel.innerHTML = periodeYears().map(y => `<option value="${y}">${y}</option>`).join('');
+            sel.value = cur;
+        }
+        function pindahTahap() {
+            const ta = document.getElementById('mv-ta').value;
+            const dari = document.getElementById('mv-dari').value, ke = document.getElementById('mv-ke').value;
+            const ubahBukti = document.getElementById('mv-bukti').checked;
+            if (dari === ke) { showToast('Tahap asal dan tujuan tidak boleh sama.'); return; }
+            const sd = TAHAP_SEM[dari], sk = TAHAP_SEM[ke];
+            const pen = db.pendapatan.filter(x => String(x.ta) === ta && x.semester === sd);
+            const exp = db.pengeluaran.filter(x => String(x.ta) === ta && x.semester === sd);
+            const nota = (db.nota || []).filter(n => notaTA(n) === ta && notaSem(n) === sd);
+            const total = pen.length + exp.length + nota.length;
+            if (!total) { showToast(`Tidak ada data di T.A. ${ta} Tahap ${dari}.`); return; }
+            konfirmasi(`Pindahkan ${pen.length} pendapatan, ${exp.length} pengeluaran, dan ${nota.length} nota dari Tahap ${dari} ke Tahap ${ke} (T.A. ${ta})?`, () => {
+                pen.forEach(x => { x.semester = sk; });
+                exp.forEach(x => {
+                    x.semester = sk;
+                    if (ubahBukti) x.nobukti = String(x.nobukti || '').replace(/T[12]\b/, 'T' + ke);
+                });
+                nota.forEach(n => { n.ta = ta; n.semester = sk; });
+                periodeView = { ta: ta, tahap: ke };
+                try { localStorage.setItem('sikma_view', JSON.stringify(periodeView)); } catch (e) {}
+                saveDb();
+                showToast(`${total} data dipindahkan ke Tahap ${ke}.`);
+            });
+            document.querySelector('#confirm-box .card h4').innerText = 'Pindahkan Data';
+            document.getElementById('confirm-ok').innerText = 'Ya, Pindahkan';
+        }
         function fillSettingsForm() {
+            fillMoveForm();
             const s = db.settings || {};
             const map = { 'set-madrasah': 'madrasah', 'set-desa': 'desa', 'set-kabupaten': 'kabupaten', 'set-provinsi': 'provinsi', 'set-kamad': 'kamad', 'set-bendahara': 'bendahara', 'set-ta': 'ta', 'set-semester': 'semester', 'set-formatbukti': 'formatBukti' };
             Object.keys(map).forEach(id => { if (s[map[id]] !== undefined) document.getElementById(id).value = s[map[id]]; });
@@ -3007,10 +3188,28 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
     const RAB_SAMPLE = [["h", "A", "3.2.1", "Proses pembelajaran dilaksanakan dengan tepat", 0, "", 0], ["i", "", "", "Gaji/Honor rutin semua GBPNS", 6, "bulan", 11700000], ["i", "", "", "Gaji/ Honor rutin GTK/ Kepala Sekolah", 6, "bulan", 400000], ["i", "", "", "Gaji/ Honor rutin GTK/ TU", 6, "bulan", 250000], ["i", "", "", "Gaji/ Honor rutin GTK/ Bendahara", 6, "bulan", 250000], ["i", "", "", "Gaji/ Honor rutin GTK/ Operator", 6, "bulan", 250000], ["s", "", "", "Pelaksanaan Ujian Mdarasah (UM)", 0, "", 0], ["i", "", "", "Gaji/ Honor pengawas UM", 9, "hari", 100000], ["i", "", "", "Gaji/ Honor panitia UM", 7, "orang", 250000], ["s", "", "", "Pelaksanaan Penilaian Akhir Semester (PAS)", 0, "", 0], ["i", "", "", "Gaji/ Honor pengawas semester genap", 9, "hari", 140000], ["i", "", "", "Gaji/ Honor panitia semester genap", 7, "orang", 250000], ["s", "", "", "Pelaksanaan Tes Kemampuan Akademik (TKA)", 0, "", 0], ["i", "", "", "Gaji/ Honor pengawas", 1, "orang", 200000], ["i", "", "", "Gaji/ Honor panitia", 4, "orang", 250000], ["i", "", "", "Gaji/ Honor proktor", 1, "orang", 250000], ["i", "", "", "Gaji/ Honor teknis", 1, "orang", 250000], ["h", "B", "8.2.1", "Penyediaan beban Oprasional Madrasah", 0, "", 0], ["i", "", "", "HVS", 20, "rim", 50000], ["i", "", "", "VD/Buram", 4, "rim", 32000], ["i", "", "", "HVS Warna", 4, "rim", 75000], ["i", "", "", "Buffallow", 2, "rim", 33000], ["i", "", "", "Transparan", 2, "rim", 39000], ["i", "", "", "Amplop kecil", 5, "kotak", 20000], ["i", "", "", "Map soal", 2, "pack", 40000], ["i", "", "", "Tinta spidol", 2, "pack", 165000], ["i", "", "", "Tinta data print", 10, "buah", 100000], ["i", "", "", "Polpen", 5, "kotak", 25000], ["i", "", "", "Spidol besar", 4, "kotak", 90000], ["i", "", "", "Spidol kecil", 1, "pack", 20000], ["i", "", "", "Ordner", 10, "buah", 55000], ["i", "", "", "Gunting", 2, "buah", 7000], ["i", "", "", "Carter", 2, "buah", 13000], ["i", "", "", "Isi stepler", 5, "kotak", 15000], ["i", "", "", "lakban bening", 8, "buah", 12000], ["i", "", "", "Lakban hitam", 8, "buah", 12000], ["i", "", "", "Penghapus papan tulis", 1, "pack", 30000], ["i", "", "", "Cetak dan Penggandaan/ fotocopy soal dan lembar jawaban", 20860, "lembar", 300], ["i", "", "", "Air galon isi ulang", 15, "galon", 25000], ["i", "", "", "kabel", 100, "meter", 6000], ["i", "", "", "Alat peraga olahraga", 1, "paket", 2450000], ["i", "", "", "Obat-obatan", 1, "Paket", 1000000], ["i", "", "", "Materai 10.000", 50, "lembar", 12000], ["i", "", "", "Alat Kebersihan (Sapulidi, Pel, Sabun, dll)", 1, "Paket", 850000], ["i", "", "", "Konsumsi KBC (Kurikulum Berbasis Cinta)", 2, "hari", 500000], ["i", "", "", "Tikar spon plastik", 10, "buah", 50000], ["i", "", "", "Lampu LED", 1, "buah", 450000], ["i", "", "", "Stop kontak/kabel roll", 3, "buah", 150000], ["i", "", "", "Baterai remote/jam dinding", 10, "buah", 15000], ["i", "", "", "Hand sanitizer dan sabun cuci tangan", 1, "Paket", 200000], ["i", "", "", "Binder Clip berbagai ukuran", 10, "kotak", 20000], ["i", "", "", "Paper Clip", 10, "kotak", 10000], ["i", "", "", "Baterai AA/AAA", 20, "pasang", 15000], ["i", "", "", "Buku Inventaris", 2, "buah", 100000], ["i", "", "", "Tisu paseo smart", 1, "Dus", 400000], ["i", "", "", "Pewangi Ruangan", 10, "buah", 35000], ["i", "", "", "Keset", 12, "buah", 50000], ["h", "C", "6.2.3", "Penyediaan Sarana dan Prasarana Perpustakaan termasuk perpustakaan digital", 0, "", 0], ["i", "", "", "Pengadaan buku paket", 3, "kelas", 1450000], ["i", "", "", "Printer", 1, "buah", 2500000], ["i", "", "", "Internet Pascabayar", 6, "bulan", 380000], ["i", "", "", "Komputer", 2, "Buah", 6000000], ["i", "", "", "Mouse komputer kabel", 5, "buah", 80000], ["i", "", "", "Lampu", 11, "buah", 55000], ["i", "", "", "Sekat Kelas 7", 2, "buah", 1375000], ["i", "", "", "Pemeliharaan papan tulis", 7, "kelas", 300000], ["i", "", "", "Pemeliharaan komputer", 2, "buah", 650000], ["i", "", "", "Pemeliharaan meja bangku", 70, "buah", 50000], ["i", "", "", "Pengadaan lemari", 1, "buah", 2200000], ["i", "", "", "Papan Pengumuman/Mading (Sarana Informasi)", 2, "buah", 600000], ["i", "", "", "Mouse USB", 4, "buah", 75000], ["i", "", "", "Flashdisk 16 GB", 1, "buah", 73000]];
     let _rabSeq = 0, _rabTimer = null, _rabWarned = false;
 
+    // RAB disimpan per Tahun Anggaran: db.rabYears = { "2026": {meta, rows}, "2027": {...} }
+    function rabTA() { return viewTA() || activeTA(); }
     function rabInit() {
-        db.rab = db.rab || {};
-        db.rab.meta = Object.assign({}, RAB_META_DEF, db.rab.meta || {});
-        db.rab.rows = Array.isArray(db.rab.rows) ? db.rab.rows : [];
+        if (!db.rabYears || typeof db.rabYears !== 'object') db.rabYears = {};
+        if (db.rab && typeof db.rab === 'object') {            // migrasi RAB lama (tunggal) -> per tahun
+            const y = String((db.rab.meta && db.rab.meta.ta) || (db.settings && db.settings.ta) || '2026');
+            const ex = db.rabYears[y];
+            if (!ex || !(ex.rows || []).length) db.rabYears[y] = { meta: db.rab.meta || {}, rows: db.rab.rows || [] };
+            if (db.rab.updatedAt && !db.rabUpdatedAt) db.rabUpdatedAt = db.rab.updatedAt;
+            delete db.rab;
+        }
+    }
+    function RB() {
+        rabInit();
+        const y = rabTA();
+        let r = db.rabYears[y];
+        if (!r) r = db.rabYears[y] = { meta: {}, rows: [] };
+        if (!r.meta) r.meta = {};
+        const def = Object.assign({}, RAB_META_DEF, { ta: y });
+        Object.keys(def).forEach(k => { if (r.meta[k] === undefined) r.meta[k] = def[k]; });
+        if (!Array.isArray(r.rows)) r.rows = [];
+        return r;
     }
     rabInit();
 
@@ -3020,26 +3219,32 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
     const rabFmt = n => Number(n || 0).toLocaleString('id-ID');
 
     function rabSave() {
-        db.rab.updatedAt = Date.now();
+        db.rabUpdatedAt = Date.now();
         try { localStorage.setItem('sikma_db', JSON.stringify(db)); } catch (e) {}
         clearTimeout(_rabTimer);
         _rabTimer = setTimeout(pushRab, 800);
     }
     function pushRab() {
         if (typeof fsdb === 'undefined' || !fsdb) return;
-        fsdb.collection('config').doc('rab').set({ json: JSON.stringify(db.rab), updatedAt: db.rab.updatedAt || 0 })
+        rabInit();
+        fsdb.collection('config').doc('rab').set({ json: JSON.stringify({ v: 2, years: db.rabYears }), updatedAt: db.rabUpdatedAt || 0 })
             .catch(e => { console.error(e); if (!_rabWarned) { _rabWarned = true; showToast('RAB tersimpan di perangkat ini. Sinkron cloud ditolak: izinkan dokumen "config/rab" di Firestore Rules.'); } });
     }
     function initRabCloud() {
         if (typeof fsdb === 'undefined' || !fsdb) return;
         fsdb.collection('config').doc('rab').onSnapshot(snap => {
-            if (!snap.exists) { if (db.rab.rows.length) pushRab(); return; }
+            rabInit();
+            if (!snap.exists) { if (Object.keys(db.rabYears).some(y => (db.rabYears[y].rows || []).length)) pushRab(); return; }
             if (snap.metadata.hasPendingWrites) return;
-            const d = snap.data(), rt = d.updatedAt || 0, lt = db.rab.updatedAt || 0;
+            const d = snap.data(), rt = d.updatedAt || 0, lt = db.rabUpdatedAt || 0;
             if (rt > lt) {
                 try {
-                    db.rab = JSON.parse(d.json); rabInit();
+                    const p = JSON.parse(d.json);
+                    if (p && p.v === 2) db.rabYears = p.years || {};
+                    else { db.rabYears = {}; db.rab = p; rabInit(); }   // format lama (satu RAB)
+                    db.rabUpdatedAt = rt;
                     localStorage.setItem('sikma_db', JSON.stringify(db));
+                    renderPeriodeBar();
                     const v = document.getElementById('view-rab');
                     if (v && !v.classList.contains('hidden') && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#view-rab'))) renderRab();
                 } catch (e) { console.error(e); }
@@ -3047,14 +3252,28 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
         }, e => console.error(e));
     }
 
+    function rabCopyPrev() {
+        const y = Number(rabTA());
+        const prev = Object.keys(db.rabYears).filter(k => Number(k) < y && (db.rabYears[k].rows || []).length).sort().pop();
+        if (!prev) { showToast('Belum ada RAB tahun sebelumnya untuk disalin.'); return; }
+        const doCopy = () => {
+            const src = db.rabYears[prev], cur = RB();
+            cur.rows = src.rows.map(r => Object.assign({}, r, { id: rabNewId() }));
+            Object.keys(src.meta || {}).forEach(k => { if (k !== 'ta' && k !== 'tempat') cur.meta[k] = src.meta[k]; });
+            cur.meta.ta = String(y);
+            rabSave(); renderRab(); showToast(`RAB ${prev} disalin ke tahun ${y}.`);
+        };
+        if (RB().rows.length) konfirmasi(`RAB tahun ${y} yang ada akan diganti dengan salinan RAB ${prev}. Lanjutkan?`, doCopy); else doCopy();
+    }
+
     function fillRabMeta() {
-        const m = db.rab.meta;
+        const m = RB().meta;
         Object.keys(m).forEach(k => {
             const el = document.getElementById('rab-m-' + k); if (!el) return;
             if (el.type === 'checkbox') el.checked = !!m[k]; else el.value = m[k];
         });
     }
-    function rabMeta(k, v) { db.rab.meta[k] = v; rabSave(); }
+    function rabMeta(k, v) { RB().meta[k] = v; rabSave(); }
 
     function rabRowHtml(r) {
         const id = r.id, inp = 'w-full bg-white border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none';
@@ -3083,8 +3302,9 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
 
     function renderRab() {
         rabInit(); fillRabMeta();
+        const yl = document.getElementById('rab-year-label'); if (yl) yl.innerText = rabTA();
         const tb = document.getElementById('rab-body');
-        tb.innerHTML = db.rab.rows.length ? db.rab.rows.map(rabRowHtml).join('')
+        tb.innerHTML = RB().rows.length ? RB().rows.map(rabRowHtml).join('')
             : '<tr><td colspan="9" class="p-8 text-center text-mutedText text-sm">Belum ada data. Klik “+ Program/Kegiatan” untuk mulai, atau “Isi data RKAM 2026”.</td></tr>';
         rabTotals();
         lucide.createIcons();
@@ -3092,33 +3312,33 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
 
     function rabTotals() {
         let total = 0, cur = null, sub = {};
-        db.rab.rows.forEach(r => {
+        RB().rows.forEach(r => {
             if (r.kind === 'h') { cur = r.id; sub[cur] = 0; }
             const j = rabJumlah(r); total += j;
             if (r.kind === 'i') { const e = document.getElementById('rab-j-' + r.id); if (e) e.innerText = rabFmt(j); if (cur) sub[cur] += j; }
         });
         Object.keys(sub).forEach(id => { const e = document.getElementById('rab-j-' + id); if (e) e.innerText = rabFmt(sub[id]); });
-        db.rab.rows.forEach(r => { if (r.kind === 's') { const e = document.getElementById('rab-j-' + r.id); if (e) e.innerText = ''; } });
+        RB().rows.forEach(r => { if (r.kind === 's') { const e = document.getElementById('rab-j-' + r.id); if (e) e.innerText = ''; } });
         document.getElementById('rab-total').innerText = formatRupiah(total);
         document.getElementById('rab-foot-total').innerText = rabFmt(total);
     }
 
     function rabEdit(id, f, v) {
-        const r = db.rab.rows.find(x => x.id === id); if (!r) return;
+        const r = RB().rows.find(x => x.id === id); if (!r) return;
         r[f] = (f === 'vol' || f === 'harga') ? (Number(v) || 0) : v;
         if (f === 'vol' || f === 'harga') rabTotals();
         rabSave();
     }
 
     function rabNextLetter() {
-        const used = db.rab.rows.filter(r => r.kind === 'h').map(r => String(r.no || '').trim().toUpperCase());
+        const used = RB().rows.filter(r => r.kind === 'h').map(r => String(r.no || '').trim().toUpperCase());
         for (let i = 0; i < 26; i++) { const c = String.fromCharCode(65 + i); if (!used.includes(c)) return c; }
         return '';
     }
 
     function rabAdd(kind, afterId) {
         const r = { id: rabNewId(), kind, no: kind === 'h' ? rabNextLetter() : '', kode: '', uraian: '', vol: 0, satuan: '', harga: 0 };
-        const rows = db.rab.rows;
+        const rows = RB().rows;
         let idx = afterId ? rows.findIndex(x => x.id === afterId) + 1 : rows.length;
         rows.splice(idx, 0, r);
         rabSave(); renderRab();
@@ -3127,38 +3347,38 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
     }
 
     function rabMove(id, d) {
-        const rows = db.rab.rows, i = rows.findIndex(x => x.id === id), j = i + d;
+        const rows = RB().rows, i = rows.findIndex(x => x.id === id), j = i + d;
         if (i < 0 || j < 0 || j >= rows.length) return;
         [rows[i], rows[j]] = [rows[j], rows[i]];
         rabSave(); renderRab();
     }
 
     function rabDel(id) {
-        const r = db.rab.rows.find(x => x.id === id); if (!r) return;
+        const r = RB().rows.find(x => x.id === id); if (!r) return;
         konfirmasi('Hapus baris ini' + (r.uraian ? ' (“' + r.uraian + '”)' : '') + '?', () => {
-            db.rab.rows = db.rab.rows.filter(x => x.id !== id);
+            RB().rows = RB().rows.filter(x => x.id !== id);
             rabSave(); renderRab();
         });
     }
 
     function rabClear() {
-        if (!db.rab.rows.length) return;
-        konfirmasi('Semua baris RAB akan dihapus. Lanjutkan?', () => { db.rab.rows = []; rabSave(); renderRab(); });
+        if (!RB().rows.length) return;
+        konfirmasi('Semua baris RAB akan dihapus. Lanjutkan?', () => { RB().rows = []; rabSave(); renderRab(); });
     }
 
     function rabLoadSample() {
         const doLoad = () => {
-            db.rab.meta = Object.assign({}, RAB_META_DEF);
-            db.rab.rows = RAB_SAMPLE.map(a => ({ id: rabNewId(), kind: a[0], no: a[1], kode: a[2], uraian: a[3], vol: a[4], satuan: a[5], harga: a[6] }));
+            RB().meta = Object.assign({}, RAB_META_DEF, { ta: rabTA() });
+            RB().rows = RAB_SAMPLE.map(a => ({ id: rabNewId(), kind: a[0], no: a[1], kode: a[2], uraian: a[3], vol: a[4], satuan: a[5], harga: a[6] }));
             rabSave(); renderRab(); showToast('Data RKAM 2026 dimuat.');
         };
-        if (db.rab.rows.length) konfirmasi('Baris RAB yang ada sekarang akan diganti dengan data RKAM 2026. Lanjutkan?', doLoad); else doLoad();
+        if (RB().rows.length) konfirmasi('Baris RAB yang ada sekarang akan diganti dengan data RKAM 2026. Lanjutkan?', doLoad); else doLoad();
     }
 
     // ---------- EKSPOR EXCEL (format mengikuti RKAM) ----------
     async function rabExportExcel() {
         if (typeof ExcelJS === 'undefined') { showToast('Pustaka Excel belum termuat. Periksa koneksi internet lalu muat ulang.'); return; }
-        const m = db.rab.meta, rows = db.rab.rows;
+        const m = RB().meta, rows = RB().rows;
         if (!rows.length) { showToast('RAB masih kosong.'); return; }
 
         const wb = new ExcelJS.Workbook();
