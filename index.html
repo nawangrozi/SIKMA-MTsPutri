@@ -300,6 +300,31 @@
         #sync-pill.s-error { color: #B91C1C; background: #FEF2F2; border-color: #FECACA; }
         @keyframes lgBlink { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
         @media (max-width: 767px) { #sync-pill .txt { display: none; } #sync-pill { padding: .45rem; } }
+        /* === Bar Periode Data: tampilan ringkas + animasi roda menggelinding === */
+        #periode-bar { position: relative; overflow: hidden;
+            background-image: linear-gradient(120deg, rgba(16,185,129,.07), rgba(214,181,109,.10)); }
+        #periode-bar > * { position: relative; z-index: 1; }
+        #periode-bar > .pb-roller { position: absolute; z-index: 0; left: 0; width: var(--rd); height: var(--rd); pointer-events: none;
+            --travel: 320px; --roll-deg: 700deg; opacity: .85;
+            animation: heroTravel var(--roll-time) ease-in-out infinite alternate; will-change: transform; }
+        .pb-roller.big   { --rd: 72px; --roll-time: 15s; top: 50%; margin-top: -36px; }
+        .pb-roller.small { --rd: 32px; --roll-time: 9s;  bottom: 6px; animation-direction: alternate-reverse; }
+        .pb-roller.small .hero-disc { animation-direction: alternate-reverse; }
+        .pb-roller .hero-disc { box-shadow: inset 0 0 12px rgba(214,181,109,.28), 0 6px 14px -8px rgba(0,0,0,.35); }
+        .pb-roller .hero-disc::before { padding: 2px; }
+        .pb-roller .hero-disc::after  { inset: 14%; -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px)); mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px)); }
+        html:not(.dark) .pb-roller .hero-disc::after { background: repeating-conic-gradient(from 0deg, rgba(180,140,50,.55) 0 1.4deg, transparent 1.4deg 15deg); }
+        @media (max-width: 767px) {
+            #periode-bar { padding: .6rem .75rem !important; margin-bottom: .75rem !important; border-radius: .9rem !important; gap: .4rem !important; }
+            #periode-bar .pb-fields { display: grid !important; grid-template-columns: 1.45fr 1fr; gap: .4rem !important; width: 100%; }
+            #periode-bar .pb-title { grid-column: 1 / -1; font-size: 10.5px !important; letter-spacing: .08em; }
+            #periode-bar .pb-title svg { width: .85rem !important; height: .85rem !important; }
+            #periode-bar select { font-size: 13px !important; padding: .38rem 1.4rem .38rem .6rem !important; border-radius: .6rem !important; min-height: 0 !important; height: 2.05rem; width: 100%; min-width: 0; text-overflow: ellipsis; }
+            #periode-info { font-size: 10.5px !important; line-height: 1.35; }
+            .pb-roller.big   { --rd: 52px; --roll-time: 12s; margin-top: -26px; }
+            .pb-roller.small { --rd: 24px; --roll-time: 8s; }
+        }
+        @media (prefers-reduced-motion: reduce) { #periode-bar > .pb-roller, .pb-roller .hero-disc { animation: none !important; } .pb-roller.small { display: none; } #periode-bar > .pb-roller.big { left: auto; right: 12px; } }
         @media print { #confirm-box, #sidebar-overlay, #periode-bar { display:none !important; } }
         /* ===== TOMBOL AKSI FORM PENGELUARAN (Simpan lebih besar dari Batal) ===== */
         .form-actions { display: flex; align-items: stretch; gap: .75rem; }
@@ -658,8 +683,11 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             
             <!-- BAR PERIODE -->
             <div id="periode-bar" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div class="flex flex-wrap items-center gap-2.5">
-                    <span class="text-xs font-bold text-emeraldDeep uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="calendar-range" class="w-4 h-4"></i><span>Periode Data</span></span>
+                <!-- animasi roda (sama seperti hero Beranda) -->
+                <div class="pb-roller big" aria-hidden="true"><div class="hero-disc"></div></div>
+                <div class="pb-roller small" aria-hidden="true"><div class="hero-disc"></div></div>
+                <div class="pb-fields flex flex-wrap items-center gap-2.5">
+                    <span class="pb-title text-xs font-bold text-emeraldDeep uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="calendar-range" class="w-4 h-4"></i><span>Periode Data</span></span>
                     <select id="periode-ta" onchange="setPeriode()" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none"></select>
                     <select id="periode-tahap" onchange="setPeriode()" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none">
                         <option value="">Semua Tahap</option>
@@ -2128,6 +2156,25 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                 });
             };
             if (window.ResizeObserver) new ResizeObserver(update).observe(hero);
+            window.addEventListener('resize', update);
+            update();
+        })();
+
+        // Bar Periode Data: jarak gelinding & jumlah putaran roda disesuaikan dengan lebar bar
+        (function initPeriodeRoller() {
+            const bar = document.getElementById('periode-bar');
+            const rollers = bar ? bar.querySelectorAll('.pb-roller') : [];
+            if (!bar || !rollers.length) return;
+            const update = () => {
+                const w = bar.clientWidth; if (!w) return;
+                rollers.forEach(r => {
+                    const d = r.offsetWidth || 40;
+                    const travel = Math.max(0, w - d - 16);
+                    r.style.setProperty('--travel', travel + 'px');
+                    r.style.setProperty('--roll-deg', (travel / (d / 2) * 180 / Math.PI).toFixed(1) + 'deg');
+                });
+            };
+            if (window.ResizeObserver) new ResizeObserver(update).observe(bar);
             window.addEventListener('resize', update);
             update();
         })();
