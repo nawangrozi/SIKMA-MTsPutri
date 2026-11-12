@@ -1297,11 +1297,16 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div>
                             <h4 class="font-bold text-darkText flex items-center space-x-2"><i data-lucide="shopping-bag" class="w-5 h-5 text-emeraldDeep"></i><span>LPJ — Nota Toko</span></h4>
-                            <p class="text-xs text-mutedText mt-1">Semua nota yang sudah disimpan digabung menjadi 1 file PDF (1 nota per halaman A4), diurutkan menurut nomor nota.</p>
+                            <p class="text-xs text-mutedText mt-1">Semua nota yang sudah disimpan digabung menjadi 1 file PDF atau Word dengan 4 nota per halaman A4 (susunan 2 × 2: nota 1 &amp; 2 di atas, nota 3 &amp; 4 di bawah), diurutkan menurut nomor nota.</p>
                         </div>
-                        <button id="lpj-n-btn" onclick="downloadLpjNota()" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-700 shadow flex items-center justify-center space-x-2">
-                            <i data-lucide="file-down" class="w-4 h-4"></i><span id="lpj-n-btn-text">Download PDF Semua Nota</span>
-                        </button>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button id="lpj-n-btn" onclick="downloadLpjNota()" class="bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-700 shadow flex items-center justify-center space-x-2">
+                                <i data-lucide="file-down" class="w-4 h-4"></i><span id="lpj-n-btn-text">Download PDF Semua Nota</span>
+                            </button>
+                            <button id="lpj-n-btn-word" onclick="downloadLpjNotaWord()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 shadow flex items-center justify-center space-x-2">
+                                <i data-lucide="file-code" class="w-4 h-4"></i><span id="lpj-n-btn-word-text">Download Word (4 Nota/Halaman)</span>
+                            </button>
+                        </div>
                     </div>
                     <div id="lpj-n-progress" class="hidden"><div class="h-2 rounded-full bg-gray-100 overflow-hidden"><div id="lpj-n-bar" class="h-full w-0 bg-emerald-500 transition-all"></div></div><p id="lpj-n-status" class="text-xs text-mutedText mt-1">Memproses…</p></div>
                     <div class="overflow-x-auto">
@@ -3004,37 +3009,123 @@ html.dark header.hdr .hdr-logout { background: rgba(239,68,68,.12); color: #FCA5
             lpjFinish('k', DEF);
         }
 
+        // ---- LPJ NOTA: 4 nota per halaman A4 (2 x 2), urut kiri-kanan lalu atas-bawah ----
+        const NOTA_PW = 794, NOTA_PH = 1123;           // ukuran 1 nota (px)
+        const LPJ_M = 6, LPJ_GAP = 4;                  // margin halaman & jarak antar nota (mm)
+        const LPJ_CW = (210 - 2 * LPJ_M - LPJ_GAP) / 2;            // lebar tiap nota (mm)
+        const LPJ_CH = LPJ_CW * NOTA_PH / NOTA_PW;                 // tinggi tiap nota (mm)
+        const LPJ_TOP = (297 - (2 * LPJ_CH + LPJ_GAP)) / 2;        // posisi atas agar kisi berada di tengah
+
+        function lpjNotaBusy(on) {
+            lpjBusy.n = on;
+            ['lpj-n-btn', 'lpj-n-btn-word'].forEach(id => {
+                const b = document.getElementById(id); if (!b) return;
+                b.disabled = on; b.classList.toggle('opacity-60', on); b.classList.toggle('cursor-not-allowed', on);
+            });
+            if (!on) {
+                document.getElementById('lpj-n-btn-text').innerText = 'Download PDF Semua Nota';
+                const w = document.getElementById('lpj-n-btn-word-text'); if (w) w.innerText = 'Download Word (4 Nota/Halaman)';
+                setTimeout(() => document.getElementById('lpj-n-progress').classList.add('hidden'), 1200);
+            } else {
+                document.getElementById('lpj-n-btn-text').innerText = 'Memproses…';
+                const w = document.getElementById('lpj-n-btn-word-text'); if (w) w.innerText = 'Memproses…';
+            }
+        }
+        // Render setiap nota menjadi gambar JPEG (data URL), berurutan menurut nomor nota
+        async function lpjRenderNotaImages(list) {
+            if (document.fonts && document.fonts.ready) await document.fonts.ready;
+            const logo = (db.settings && db.settings.nota && db.settings.nota.logo) || '';
+            const imgs = [];
+            for (let i = 0; i < list.length; i++) {
+                lpjProgress('n', i + 1, list.length, 'Membuat nota');
+                await lpjTick();
+                const n = Object.assign({}, list[i]);
+                if (!n.toko) { n.toko = notaToko(); delete n.toko.logo; }
+                const page = document.createElement('div');
+                page.className = 'n-page';
+                page.style.cssText = 'position:fixed;left:-10000px;top:0;transform:none;';
+                page.innerHTML = notaHtml(n, logo);
+                document.body.appendChild(page);
+                let canvas;
+                try { canvas = await html2canvas(page, { scale: 2, backgroundColor: '#ffffff', useCORS: true }); }
+                finally { document.body.removeChild(page); }
+                imgs.push(canvas.toDataURL('image/jpeg', 0.92));
+            }
+            return imgs;
+        }
+
         async function downloadLpjNota() {
             if (lpjBusy.n) return;
             const list = lpjNotaList();
             if (!list.length) { showToast('Belum ada nota tersimpan untuk diunduh.'); return; }
-            const DEF = 'Download PDF Semua Nota';
-            lpjStart('n');
+            lpjNotaBusy(true);
             try {
-                if (document.fonts && document.fonts.ready) await document.fonts.ready;
+                const imgs = await lpjRenderNotaImages(list);
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const logo = (db.settings && db.settings.nota && db.settings.nota.logo) || '';
-                for (let i = 0; i < list.length; i++) {
-                    lpjProgress('n', i + 1, list.length, 'Membuat nota');
-                    await lpjTick();
-                    const n = Object.assign({}, list[i]);
-                    if (!n.toko) { n.toko = notaToko(); delete n.toko.logo; }
-                    const page = document.createElement('div');
-                    page.className = 'n-page';
-                    page.style.cssText = 'position:fixed;left:-10000px;top:0;transform:none;';
-                    page.innerHTML = notaHtml(n, logo);
-                    document.body.appendChild(page);
-                    let canvas;
-                    try { canvas = await html2canvas(page, { scale: 2, backgroundColor: '#ffffff', useCORS: true }); }
-                    finally { document.body.removeChild(page); }
-                    if (i > 0) pdf.addPage('a4', 'p');
-                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+                const pages = Math.ceil(imgs.length / 4);
+                for (let i = 0; i < imgs.length; i++) {
+                    const slot = i % 4;
+                    if (slot === 0 && i > 0) pdf.addPage('a4', 'p');
+                    const x = LPJ_M + (slot % 2) * (LPJ_CW + LPJ_GAP);
+                    const y = LPJ_TOP + Math.floor(slot / 2) * (LPJ_CH + LPJ_GAP);
+                    pdf.addImage(imgs[i], 'JPEG', x, y, LPJ_CW, LPJ_CH, undefined, 'FAST');
+                    pdf.setDrawColor(150); pdf.setLineWidth(0.2);
+                    pdf.rect(x, y, LPJ_CW, LPJ_CH);
                 }
-                pdf.save('LPJ_Nota_Toko.pdf');
-                showToast(`LPJ Nota (${list.length} halaman) berhasil diunduh!`);
+                pdf.save('LPJ_Nota_Toko_4-per-halaman.pdf');
+                showToast(`LPJ Nota (${list.length} nota, ${pages} halaman) berhasil diunduh!`);
             } catch (e) { console.error(e); showToast('Gagal membuat PDF nota. Coba lagi.'); }
-            lpjFinish('n', DEF);
+            lpjNotaBusy(false);
+        }
+
+        async function downloadLpjNotaWord() {
+            if (lpjBusy.n) return;
+            const list = lpjNotaList();
+            if (!list.length) { showToast('Belum ada nota tersimpan untuk diunduh.'); return; }
+            if (!window.docx) { showToast('Pustaka Word belum termuat. Muat ulang halaman.'); return; }
+            lpjNotaBusy(true);
+            try {
+                const imgs = await lpjRenderNotaImages(list);
+                const { Document, Packer, Paragraph, Table, TableRow, TableCell, ImageRun, WidthType, BorderStyle, PageBreak, AlignmentType, HeightRule } = window.docx;
+                const mm2tw = mm => Math.round(mm * 56.6929);   // mm -> twip
+                const mm2px = mm => Math.round(mm * 96 / 25.4); // mm -> px (96 dpi)
+                const toBytes = d => { const b = atob(d.split(',')[1]); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; };
+                const none = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+                const noB = { top: none, bottom: none, left: none, right: none };
+                const cellW = mm2tw(LPJ_CW + LPJ_GAP / 2);
+                const children = [];
+                for (let p = 0; p < imgs.length; p += 4) {
+                    const mk = k => {
+                        const img = imgs[p + k];
+                        const para = img
+                            ? new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 0, after: 0 }, children: [new ImageRun({ data: toBytes(img), transformation: { width: mm2px(LPJ_CW), height: mm2px(LPJ_CH) } })] })
+                            : new Paragraph({ children: [] });
+                        return new TableCell({ width: { size: cellW, type: WidthType.DXA }, borders: noB, margins: { top: 0, bottom: 0, left: 0, right: 0 }, children: [para] });
+                    };
+                    children.push(new Table({
+                        width: { size: cellW * 2, type: WidthType.DXA }, columnWidths: [cellW, cellW],
+                        borders: { top: none, bottom: none, left: none, right: none, insideHorizontal: none, insideVertical: none },
+                        rows: [
+                            new TableRow({ children: [mk(0), mk(1)] }),
+                            new TableRow({ children: [mk(2), mk(3)] })
+                        ]
+                    }));
+                    if (p + 4 < imgs.length) children.push(new Paragraph({ spacing: { before: 0, after: 0 }, children: [new PageBreak()] }));
+                }
+                const doc = new Document({
+                    sections: [{
+                        properties: { page: { size: { width: mm2tw(210), height: mm2tw(297) }, margin: { top: mm2tw(LPJ_TOP), bottom: mm2tw(LPJ_TOP), left: mm2tw(LPJ_M), right: mm2tw(LPJ_M) } } },
+                        children
+                    }]
+                });
+                const blob = await Packer.toBlob(doc);
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob); a.download = 'LPJ_Nota_Toko_4-per-halaman.docx';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                showToast(`LPJ Nota Word (${list.length} nota, ${Math.ceil(imgs.length / 4)} halaman) berhasil diunduh!`);
+            } catch (e) { console.error(e); showToast('Gagal membuat file Word nota. Coba lagi.'); }
+            lpjNotaBusy(false);
         }
 
         let lgFails = 0, lgLockUntil = 0;
