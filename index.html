@@ -589,6 +589,119 @@ html.dark{--s-text:#EFE3BE}
 html.dark .text-emerald-100,html.dark .text-emerald-50,html.dark .text-gray-100,html.dark .text-gray-200,html.dark .text-gray-300{color:var(--gold-txt-soft)!important}
 html.dark input,html.dark select,html.dark textarea{color:#EFE3BE}
 </style>
+<style id="login-v3">
+/* ===== LOGIN v3: intro sinematik (logo meledak muncul, cahaya, huruf, popup) ===== */
+#login-screen.lg-measure *{animation:none!important;transition:none!important}
+#lg-dust{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.lg-stage,.lg-fx{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.lg-stage{z-index:0}
+.lg-fx{z-index:3}
+.lg-rays{position:absolute;left:var(--lx,50%);top:var(--ly,30%);width:0;height:0}
+.lg-rays i{position:absolute;left:-75vmax;top:-75vmax;width:150vmax;height:150vmax;border-radius:50%;opacity:.42;will-change:transform;
+  background:repeating-conic-gradient(from 0deg,rgba(240,205,120,.26) 0deg 3deg,transparent 3deg 14deg);
+  -webkit-mask:radial-gradient(circle,#000 0,rgba(0,0,0,.55) 26%,transparent 60%);mask:radial-gradient(circle,#000 0,rgba(0,0,0,.55) 26%,transparent 60%);
+  animation:lgRaySpin 90s linear infinite}
+html:not(.dark) .lg-rays i{opacity:.4;background:repeating-conic-gradient(from 0deg,rgba(184,137,43,.2) 0deg 3deg,transparent 3deg 14deg)}
+@keyframes lgRaySpin{to{transform:rotate(360deg)}}
+.lg-flash{position:absolute;inset:0;opacity:0;background:radial-gradient(circle at 50% 50%,rgba(255,246,214,.95),rgba(240,205,120,.5) 34%,transparent 70%)}
+.lg-wave{position:absolute;left:50%;top:50%;width:90vmin;height:90vmin;margin:-45vmin 0 0 -45vmin;border-radius:50%;opacity:0;
+  border:2px solid rgba(240,205,120,.95);box-shadow:0 0 40px rgba(240,205,120,.45),inset 0 0 40px rgba(240,205,120,.25)}
+html:not(.dark) .lg-wave{border-color:rgba(184,137,43,.8);box-shadow:0 0 30px rgba(184,137,43,.3)}
+.lg-dot{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px;border-radius:50%;opacity:0;background:#fff6d6;
+  box-shadow:0 0 30px 12px rgba(240,205,120,.8),0 0 90px 40px rgba(230,195,106,.35)}
+@keyframes lgDot{0%{opacity:0;scale:.2}70%{opacity:1;scale:1.5}100%{opacity:0;scale:3.4}}
+@keyframes lgFlash{0%{opacity:.95}100%{opacity:0}}
+@keyframes lgWave{0%{opacity:.9;scale:.05}100%{opacity:0;scale:2.3}}
+html #login-screen.lg-play .lg-dot{animation:lgDot .95s ease-in .1s both}
+html #login-screen.lg-play .lg-flash,html #login-screen.lg-win .lg-flash{animation:lgFlash .75s ease-out .9s both}
+html #login-screen.lg-play .lg-wave{animation:lgWave 1.6s cubic-bezier(.15,.7,.3,1) .9s both}
+html #login-screen.lg-play .lg-wave.w2{animation-delay:1.12s}
+html #login-screen.lg-win .lg-flash{animation-delay:0s;animation-duration:.6s}
+html #login-screen.lg-win .lg-wave{animation:lgWave 1.1s cubic-bezier(.15,.7,.3,1) both}
+
+/* logo */
+.lg-halo{position:absolute;inset:-48%;border-radius:50%;pointer-events:none;animation:lgBreath 5s ease-in-out infinite;
+  background:radial-gradient(circle,rgba(240,205,120,.44),rgba(240,205,120,.13) 45%,transparent 68%)}
+html:not(.dark) .lg-halo{background:radial-gradient(circle,rgba(201,162,74,.3),rgba(201,162,74,.08) 45%,transparent 68%)}
+.lg-logo.has-mask::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(110deg,transparent 42%,rgba(255,255,255,.95) 50%,transparent 58%) 100% 0/300% 100% no-repeat;
+  -webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat;animation:lgGlintLoop 8s ease-in-out 6s infinite}
+@keyframes lgGlint{0%{background-position:100% 0}100%{background-position:0 0}}
+@keyframes lgGlintLoop{0%,78%{background-position:100% 0}100%{background-position:0 0}}
+@keyframes lgLogoFly{
+  0%{opacity:0;translate:var(--dx,0) var(--dy,0);scale:.08;rotate:-50deg;animation-timing-function:cubic-bezier(.3,1.5,.5,1)}
+  22%{opacity:1;translate:var(--dx,0) var(--dy,0);scale:var(--big,2);rotate:0deg;animation-timing-function:linear}
+  56%{opacity:1;translate:var(--dx,0) var(--dy,0);scale:var(--big,2);rotate:0deg;animation-timing-function:cubic-bezier(.65,0,.25,1)}
+  100%{opacity:1;translate:0 0;scale:1;rotate:0deg}}
+@keyframes lgRayFlight{0%,56%{translate:var(--dx,0) var(--dy,0);animation-timing-function:cubic-bezier(.65,0,.25,1)}100%{translate:0 0}}
+@keyframes lgRayIn{from{opacity:0;scale:.3}}
+
+/* teks */
+.lg-eyebrow{display:flex;align-items:center;gap:.8rem;margin-top:1.3rem;font-family:'Plus Jakarta Sans','Inter',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+.lg-eyebrow::before{content:'';width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+.lg-eyebrow::after{content:'';flex:0 1 56px;width:56px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);transform-origin:left}
+html #login-screen .lg-stack > .lg-eyebrow{margin-bottom:-.2rem}
+@keyframes lgEyebrow{from{opacity:0;letter-spacing:.8em;filter:blur(6px)}}
+@keyframes lgLine{from{scale:0 1}}
+@keyframes lgTitleIn{from{opacity:0;letter-spacing:.75em;filter:blur(16px);scale:1.12}}
+@keyframes lgPill{from{opacity:0;translate:-34px 0;scale:.8;filter:blur(4px)}}
+@keyframes lgCardPop{from{opacity:0;translate:0 70px;scale:.86;filter:blur(12px)}55%{filter:blur(0)}}
+@keyframes lgFade{from{opacity:0}}
+html #login-screen .lg-points li{width:fit-content;max-width:100%;padding:.62rem 1.05rem;border-radius:14px;background:var(--card);border:1px solid rgba(201,162,74,.28);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 14px 28px -20px rgba(60,45,10,.5)}
+html #login-screen .lg-points li:nth-child(1){--j:0}html #login-screen .lg-points li:nth-child(2){--j:1}html #login-screen .lg-points li:nth-child(3){--j:2}
+html #login-screen .lg-points li{margin-top:.7rem}
+
+/* badge popup di kartu */
+.lg-card > .lg-badge{position:absolute;top:-14px;left:50%;translate:-50% 0;z-index:2;display:flex;align-items:center;gap:.5rem;padding:.4rem .95rem;border-radius:999px;
+  font-size:.64rem;font-weight:800;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap;color:#2A2108;
+  background:linear-gradient(120deg,#C9A24A,#F6E3A1 50%,#C9A24A);box-shadow:0 10px 22px -8px rgba(150,110,20,.8),inset 0 1px 0 rgba(255,255,255,.6);animation:lgBadgeFloat 4.5s ease-in-out infinite}
+.lg-badge i{width:6px;height:6px;border-radius:50%;background:#2A2108;animation:lgBlink 2s ease-in-out infinite}
+@keyframes lgBadge{from{opacity:0;scale:.3;translate:-50% 18px}}
+@keyframes lgBadgeFloat{0%,100%{translate:-50% 0}50%{translate:-50% -3px}}
+
+/* tombol suara */
+#login-screen .lg-snd{right:4rem}
+.lg-snd .ic-on{display:none}.lg-snd .ic-off{display:inline-flex}
+.lg-snd.on .ic-on{display:inline-flex}.lg-snd.on .ic-off{display:none}
+.lg-snd.on{box-shadow:0 0 0 1px var(--gold),0 0 18px -4px var(--gold)}
+
+/* ===== TIMELINE (aktif hanya saat .lg-play) ===== */
+html #login-screen.lg-play .lg-rays{animation:lgRayFlight 2.4s linear .9s backwards}
+html #login-screen.lg-play .lg-rays i{animation:lgRayIn 1.6s ease .9s backwards,lgRaySpin 90s linear infinite}
+html #login-screen.lg-play .lg-stack > .lg-logo{animation:lgLogoFly 2.4s linear .9s backwards}
+html #login-screen.lg-play .lg-logo.has-mask::after{animation:lgGlint 1.2s ease 1.9s backwards,lgGlintLoop 8s ease-in-out 7s infinite}
+html #login-screen.lg-play .lg-stack > .lg-eyebrow{animation:lgEyebrow 1.1s cubic-bezier(.2,.8,.2,1) 3s backwards}
+html #login-screen.lg-play .lg-eyebrow::after{animation:lgLine .9s cubic-bezier(.2,.8,.2,1) 3.3s backwards}
+html #login-screen.lg-play .lg-stack > .lg-title{animation:lgTitleIn 1.3s cubic-bezier(.2,.8,.2,1) 3.1s backwards,lgGold 6s ease-in-out 4.4s infinite}
+html #login-screen.lg-play .lg-stack > .lg-sub{animation:lgRise .9s cubic-bezier(.2,.8,.2,1) 3.55s backwards}
+html #login-screen.lg-play .lg-stack > .lg-points{animation:none}
+html #login-screen.lg-play .lg-points li{animation:lgPill .8s cubic-bezier(.34,1.56,.64,1) calc(3.75s + var(--j,0) * .16s) backwards}
+html #login-screen.lg-play .lg-stack > .lg-card{animation:lgCardPop 1.1s cubic-bezier(.2,.9,.2,1) 3.4s backwards}
+html #login-screen.lg-play .lg-card > .lg-badge{animation:lgBadge .9s cubic-bezier(.34,1.56,.64,1) 4.15s backwards,lgBadgeFloat 4.5s ease-in-out 5.2s infinite}
+html #login-screen.lg-play .lg-stack > .lg-foot{animation:lgRise .9s ease 4.3s backwards}
+html #login-screen.lg-play .login-theme,html #login-screen.lg-play .lg-snd{animation:lgFade .8s ease 3.8s backwards}
+
+/* urutan default (bila intro dilewati) */
+html #login-screen .lg-stack > .lg-logo{--i:0}html #login-screen .lg-stack > .lg-eyebrow{--i:1}html #login-screen .lg-stack > .lg-title{--i:2}
+html #login-screen .lg-stack > .lg-sub{--i:3}html #login-screen .lg-stack > .lg-points{--i:4}html #login-screen .lg-stack > .lg-card{--i:5}html #login-screen .lg-stack > .lg-foot{--i:7}
+
+@media (min-width:1000px){
+  html #login-screen .lg-stack > .lg-eyebrow{grid-column:1;grid-row:2;margin-top:1.5rem}
+  html #login-screen .lg-stack > .lg-title{grid-row:3;margin-top:.7rem}
+  html #login-screen .lg-stack > .lg-sub{grid-row:4}
+  html #login-screen .lg-stack > .lg-points{grid-row:5}
+  html #login-screen .lg-stack > .lg-foot{grid-row:6}
+  html #login-screen .lg-stack > .lg-card{grid-row:1/span 6}
+  .lg-eyebrow::before{display:none}
+}
+@media (max-width:999px){.lg-eyebrow{justify-content:center;font-size:.62rem;letter-spacing:.26em}}
+@media (max-width:420px){.lg-eyebrow{letter-spacing:.18em;gap:.5rem}.lg-eyebrow::before,.lg-eyebrow::after{width:22px;flex-basis:22px}}
+html #login-screen .lg-btn,html #login-screen .lg-btn span{color:#4A3207!important;-webkit-text-fill-color:#4A3207;text-shadow:0 1px 0 rgba(255,236,170,.55);letter-spacing:.06em}
+html #login-screen .lg-card h2{background:linear-gradient(100deg,#B8892B,#F0D58A 45%,#C9A24A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+html:not(.dark) #login-screen .lg-card h2{background:linear-gradient(100deg,#8A6414,#C9A24A 50%,#9C7220);-webkit-background-clip:text;background-clip:text}
+@media (prefers-reduced-motion:reduce){.lg-rays i,.lg-halo,.lg-badge,.lg-logo.has-mask::after{animation:none!important}#lg-dust{display:none}}
+</style>
 </head>
 
 <body class="flex h-screen overflow-hidden">
@@ -604,17 +717,26 @@ html.dark input,html.dark select,html.dark textarea{color:#EFE3BE}
     <!-- ============ HALAMAN LOGIN ============ -->
     <div id="login-screen">
         <canvas id="lg-swarm" aria-hidden="true"></canvas>
+        <canvas id="lg-dust" aria-hidden="true"></canvas>
+        <div class="lg-stage" aria-hidden="true"><div class="lg-rays"><i></i></div></div>
+        <div class="lg-fx" aria-hidden="true"><div class="lg-flash"></div><span class="lg-wave"></span><span class="lg-wave w2"></span><span class="lg-dot"></span></div>
         <button type="button" onclick="toggleTheme()" class="theme-toggle login-theme" title="Ganti mode terang/gelap" aria-label="Ganti mode terang/gelap">
             <span class="ic-moon"><i data-lucide="moon" class="w-5 h-5"></i></span>
             <span class="ic-sun"><i data-lucide="sun" class="w-5 h-5"></i></span>
         </button>
+        <button type="button" id="lg-snd" class="theme-toggle login-theme lg-snd" title="Suara intro: ketuk untuk menyalakan/mematikan" aria-label="Suara intro: ketuk untuk menyalakan atau mematikan" aria-pressed="false">
+            <span class="ic-on"><i data-lucide="volume-2" class="w-5 h-5"></i></span>
+            <span class="ic-off"><i data-lucide="volume-x" class="w-5 h-5"></i></span>
+        </button>
         <div class="lg-stack">
-            <div class="lg-logo"><span class="lg-ring"></span><span class="lg-ring r2"></span><img id="lg-logo-img" alt="Logo MTs Putri Hikmatusysyarief NWDI Salut"></div>
+            <div class="lg-logo"><span class="lg-halo"></span><span class="lg-ring"></span><span class="lg-ring r2"></span><img id="lg-logo-img" alt="Logo MTs Putri Hikmatusysyarief NWDI Salut"></div>
+            <p class="lg-eyebrow">Madrasah Tsanawiyah Putri</p>
             <h1 class="lg-title">SIKMA</h1>
             <p class="lg-sub">Sistem Informasi Keuangan Madrasah</p>
             <ul class="lg-points"><li>Pencatatan pendapatan &amp; pengeluaran rapi</li><li>Kuitansi, nota toko &amp; LPJ otomatis</li><li>Laporan keuangan siap cetak</li></ul>
             <form class="lg-card" id="lg-card" onsubmit="doLogin(event)" autocomplete="off">
                 <div class="lg-spot"></div>
+                <div class="lg-badge"><i></i>Selamat Datang</div>
                 <h2>Masuk</h2>
                 <p class="lg-help">Masukkan kata sandi pengelola keuangan.</p>
                 <label for="lg-pass" class="lg-label">Kata sandi</label>
@@ -706,8 +828,188 @@ html.dark input,html.dark select,html.dark textarea{color:#EFE3BE}
         new MutationObserver(start).observe(document.body, { attributes: true, attributeFilter: ['class'] });
         window.lgSwarm = {
             burst: function () { var c = document.getElementById('lg-card').getBoundingClientRect(); ripple(c.left + c.width / 2, c.top + c.height / 2, 1.6); setTimeout(function () { ripple(c.left + c.width / 2, c.top + c.height / 2, 1.1); }, 220); },
-            gather: function () { gatherUntil = performance.now() + 700; var c = document.getElementById('lg-card').getBoundingClientRect(); ripple(c.left + c.width / 2, c.top + c.height / 2, 1.4); }
+            at: ripple, gather: function () { gatherUntil = performance.now() + 700; var c = document.getElementById('lg-card').getBoundingClientRect(); ripple(c.left + c.width / 2, c.top + c.height / 2, 1.4); }
         };
+        start();
+    })();
+    </script>
+
+    <script id="login-intro">
+    /* Intro login: logo muncul (ledakan cahaya) -> terbang ke posisi -> teks & popup. Klik/ketuk/tombol apa pun = lewati. */
+    (function () {
+        var ls = document.getElementById('login-screen'); if (!ls) return;
+        var body = document.body, root = document.documentElement;
+        var logo = ls.querySelector('.lg-logo'), img = document.getElementById('lg-logo-img'), snd = document.getElementById('lg-snd');
+        var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var locked = function () { return body.classList.contains('locked'); };
+        var armed = false, timers = [], soundOn = false, pendingSound = false;
+        soundOn = true; try { soundOn = localStorage.getItem('sikma_snd') !== '0'; } catch (e) {}
+        if (snd) { snd.classList.toggle('on', soundOn); snd.setAttribute('aria-pressed', String(soundOn)); }
+        function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+        function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+        /* kilau (shine) memakai bentuk logo sebagai mask */
+        function setMask() { if (!img || !logo || !img.src || !img.naturalWidth) return; logo.style.setProperty('--logo', 'url("' + img.src + '")'); logo.classList.add('has-mask'); }
+        if (img) { img.addEventListener('load', setMask); setMask(); }
+
+        /* ukur posisi akhir logo (tanpa animasi) lalu hitung terbang dari tengah layar */
+        function measure() {
+            ls.classList.add('lg-measure');
+            var r = logo.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight, lx = r.left + r.width / 2, ly = r.top + r.height / 2, s = ls.style;
+            ls.classList.remove('lg-measure');
+            if (!r.width) return;
+            s.setProperty('--lx', lx + 'px'); s.setProperty('--ly', ly + 'px');
+            s.setProperty('--dx', (vw / 2 - lx) + 'px'); s.setProperty('--dy', (vh / 2 - ly) + 'px');
+            s.setProperty('--big', Math.max(1.4, Math.min(250, Math.min(vw, vh) * .4) / r.width).toFixed(3));
+        }
+
+        /* ---------- suara (sintesis WebAudio, tanpa file) ---------- */
+        var AC = window.AudioContext || window.webkitAudioContext, ac = null, master = null, nbuf = null;
+        function ctxOk() { if (!AC) return false; if (!ac) ac = new AC(); if (ac.state === 'suspended') ac.resume(); return true; }
+        function noiseBuf() { if (nbuf) return nbuf; nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); var d = nbuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return nbuf; }
+        function bus() {
+            var m = ac.createGain(), comp = ac.createDynamicsCompressor(), rv = ac.createConvolver(), wet = ac.createGain(), len = Math.floor(ac.sampleRate * 1.8), b = ac.createBuffer(2, len, ac.sampleRate);
+            m.gain.value = .9; wet.gain.value = .32;
+            for (var c = 0; c < 2; c++) { var d = b.getChannelData(c); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+            rv.buffer = b; m.connect(comp); m.connect(rv); rv.connect(wet); wet.connect(comp); comp.connect(ac.destination); return m;
+        }
+        function tone(m, t, f, d, g, type) { var o = ac.createOscillator(), x = ac.createGain(); o.type = type || 'sine'; o.frequency.value = f; x.gain.setValueAtTime(.0001, t); x.gain.exponentialRampToValueAtTime(g, t + .012); x.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(x); x.connect(m); o.start(t); o.stop(t + d + .05); }
+        function bell(m, t, f, d, g) { tone(m, t, f, d, g); tone(m, t, f * 2.01, d * .6, g * .35); tone(m, t, f * 3.02, d * .35, g * .14); }
+        function swoosh(m, t, d, g, f0, f1, rise) {
+            var s = ac.createBufferSource(), flt = ac.createBiquadFilter(), x = ac.createGain();
+            s.buffer = noiseBuf(); flt.type = 'bandpass'; flt.Q.value = 1.2; flt.frequency.setValueAtTime(f0, t); flt.frequency.exponentialRampToValueAtTime(f1, t + d);
+            x.gain.setValueAtTime(rise ? .0001 : g, t); x.gain.exponentialRampToValueAtTime(rise ? g : .0001, t + d);
+            s.connect(flt); flt.connect(x); x.connect(m); s.start(t); s.stop(t + d + .05);
+        }
+var stimers = [];
+        function stopSound(quick) {
+            stimers.forEach(clearTimeout); stimers = [];
+            if (!master || !ac) return;
+            try { master.gain.cancelScheduledValues(ac.currentTime); master.gain.setTargetAtTime(.0001, ac.currentTime, quick ? .02 : .35); } catch (e) {}
+            master = null;
+        }
+        function kick(m, t) { var o = ac.createOscillator(), x = ac.createGain(); o.frequency.setValueAtTime(125, t); o.frequency.exponentialRampToValueAtTime(45, t + .12); x.gain.setValueAtTime(.0001, t); x.gain.exponentialRampToValueAtTime(.5, t + .006); x.gain.exponentialRampToValueAtTime(.0001, t + .32); o.connect(x); x.connect(m); o.start(t); o.stop(t + .36); }
+        function hat(m, t) { var s = ac.createBufferSource(), f = ac.createBiquadFilter(), x = ac.createGain(); s.buffer = noiseBuf(); f.type = 'highpass'; f.frequency.value = 7000; x.gain.setValueAtTime(.05, t); x.gain.exponentialRampToValueAtTime(.0001, t + .05); s.connect(f); f.connect(x); x.connect(m); s.start(t); s.stop(t + .08); }
+        var CH = [{ n: [146.83, 174.61, 220, 293.66], r: 73.42 }, { n: [116.54, 174.61, 233.08, 293.66], r: 58.27 }, { n: [174.61, 220, 261.63, 349.23], r: 87.31 }, { n: [130.81, 196, 261.63, 329.63], r: 65.41 }];
+        var ARP = [0, 1, 2, 3, 2, 1];
+        /* satu bar = 4 detik (120 bpm): pad, bass, kick lembut, hi-hat, arpeggio lonceng, melodi */
+        function bar(m, k, t, groove) {
+            var C = CH[k % 4];
+            C.n.forEach(function (f) { [-1, 1].forEach(function (dt) {
+                var p = ac.createOscillator(), lp = ac.createBiquadFilter(), g = ac.createGain();
+                p.type = 'sawtooth'; p.frequency.value = f; p.detune.value = dt * 7; lp.type = 'lowpass'; lp.frequency.value = 850;
+                g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.02, t + 1); g.gain.setValueAtTime(.02, t + 3.2); g.gain.linearRampToValueAtTime(.0001, t + 5);
+                p.connect(lp); lp.connect(g); g.connect(m); p.start(t); p.stop(t + 5.1);
+            }); });
+            if (!groove) return;
+            for (var b = 0; b < 8; b++) { var tb = t + b * .5; tone(m, tb, C.r * 2, .45, .13, 'sine'); kick(m, tb); hat(m, tb + .25); }
+            for (var a = 0; a < 16; a++) bell(m, t + a * .25, C.n[ARP[a % 6]] * 4, .8, .032);
+            if (k >= 2) { bell(m, t, C.n[3] * 2, 1.8, .05); bell(m, t + 1.5, C.n[2] * 4, 1.6, .042); bell(m, t + 2.5, C.n[1] * 4, 1.6, .042); }
+        }
+        var BARS = 10;
+        /* skor ~44 detik: intro (0-4 dtk) lalu mengalir ke groove, lalu memudar halus */
+        function score(intro) {
+            if (!ctxOk()) return; stopSound(true);
+            var m = master = bus(), now = ac.currentTime + .08, k0 = intro ? 0 : 1, base = intro ? now + .9 : now + .1;
+            var tk = function (k) { return base + (k - k0) * 4; };
+            if (intro) {
+                var t = now;
+                swoosh(m, t, .85, .5, 300, 6000, true);
+                var o = ac.createOscillator(), x = ac.createGain();
+                o.frequency.setValueAtTime(95, t + .9); o.frequency.exponentialRampToValueAtTime(38, t + 1.4);
+                x.gain.setValueAtTime(.0001, t + .88); x.gain.linearRampToValueAtTime(.9, t + .91); x.gain.exponentialRampToValueAtTime(.0001, t + 2.6);
+                o.connect(x); x.connect(m); o.start(t + .88); o.stop(t + 2.7);
+                swoosh(m, t + .9, .7, .6, 3000, 400, false);
+                [587.33, 880, 1174.66].forEach(function (f, i) { bell(m, t + .9, f, 2.2, .09 - i * .015); });
+                swoosh(m, t + 2.2, 1.0, .25, 400, 3500, true);
+                var sc = [587.33, 659.25, 739.99, 880, 987.77, 1174.66, 987.77, 880];
+                sc.forEach(function (f, i) { bell(m, t + 2.5 + i * .16, f, .9, .05); });
+                [587.33, 880, 1174.66, 293.66].forEach(function (f) { bell(m, t + 3.1, f, 1.8, .07); });
+                bell(m, t + 4.15, 1318.5, .6, .06);
+            } else { m.gain.setValueAtTime(.0001, now); m.gain.linearRampToValueAtTime(.9, now + 1.6); }
+            for (var k = k0; k < BARS; k++) (function (kk) {
+                var wait = Math.max(0, (tk(kk) - ac.currentTime - 3) * 1000);
+                stimers.push(setTimeout(function () { if (master === m) bar(m, kk, Math.max(tk(kk), ac.currentTime + .02), kk >= 1); }, wait));
+            })(k);
+            var fe = tk(BARS - 1) + 3; m.gain.setValueAtTime(.9, fe); m.gain.linearRampToValueAtTime(.0001, fe + 4);
+        }
+        function chime() { if (!soundOn || !ctxOk()) return; var m = bus(), t = ac.currentTime + .02; [783.99, 1174.66, 1567.98].forEach(function (f, i) { bell(m, t + i * .09, f, 1.2, .08); }); }
+
+        /* ---------- kontrol intro ---------- */
+        function audioReady() { if (!AC) return false; try { if (!ac) ac = new AC(); if (ac.state === 'suspended') ac.resume(); return ac.state === 'running'; } catch (e) { return false; } }
+        function userActive() { return navigator.userActivation ? navigator.userActivation.hasBeenActive : true; }
+        function play(withSound) {
+            if (reduce || !locked()) return;
+            clearTimers(); ls.classList.remove('lg-play', 'lg-skipped', 'lg-win');
+            measure(); void ls.offsetWidth; ls.classList.add('lg-play'); armed = true;
+            later(function () { armed = false; }, 3400);
+            later(function () { if (window.lgSwarm && lgSwarm.at) lgSwarm.at(window.innerWidth / 2, window.innerHeight / 2, 1.9); }, 900);
+            later(function () { if (window.lgSwarm && lgSwarm.at) lgSwarm.at(window.innerWidth / 2, window.innerHeight / 2, 1.2); }, 1180);
+            later(function () { if (window.lgSwarm) lgSwarm.gather(); }, 3400);
+            if (withSound) score(true);
+        }
+        function skip() { if (!armed) return; armed = false; clearTimers(); ls.classList.remove('lg-play'); ls.classList.add('lg-skipped'); }
+        function gesture(e) {
+            if (e.target && e.target.closest && e.target.closest('#lg-snd')) return;
+            if (pendingSound) { pendingSound = false; if (armed) play(true); else score(false); return; }
+            skip();
+        }
+        ls.addEventListener('pointerup', gesture, { passive: true });
+        ls.addEventListener('touchend', gesture, { passive: true });
+        ls.addEventListener('click', gesture);
+        window.addEventListener('keydown', gesture);
+
+        if (snd) snd.addEventListener('click', function () {
+            soundOn = !soundOn;
+            try { localStorage.setItem('sikma_snd', soundOn ? '1' : '0'); } catch (e) {}
+            snd.classList.toggle('on', soundOn); snd.setAttribute('aria-pressed', String(soundOn)); pendingSound = false;
+            if (soundOn) play(true); else stopSound();
+        });
+
+        var wasLocked = locked();
+        new MutationObserver(function () { var l = locked(); if (l && !wasLocked) play(soundOn && userActive()); wasLocked = l; }).observe(body, { attributes: true, attributeFilter: ['class'] });
+        window.addEventListener('resize', function () { clearTimeout(measure._t); measure._t = setTimeout(function () { if (locked() && !armed) measure(); }, 150); });
+
+        window.lgIntro = {
+            play: play,
+            success: function () { ls.classList.remove('lg-win'); void ls.offsetWidth; ls.classList.add('lg-win'); later(function () { ls.classList.remove('lg-win'); }, 1200); chime(); stopSound(); }
+        };
+        if (locked()) { measure(); var ready = soundOn && audioReady(); pendingSound = soundOn && !ready; play(ready); }
+    })();
+
+    /* Debu emas: partikel halus yang melayang naik & berkelip (menyatu dengan grid lensa emas) */
+    (function () {
+        var cv = document.getElementById('lg-dust'); if (!cv) return;
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var ctx = cv.getContext('2d'), W = 0, H = 0, P = [], run = false, last = 0, t0 = 0, dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        var locked = function () { return document.body.classList.contains('locked'); };
+        function size() {
+            W = cv.clientWidth; H = cv.clientHeight; if (!W || !H) return false;
+            cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            var n = Math.round(Math.min(70, W * H / 16000)); P = [];
+            for (var i = 0; i < n; i++) P.push({ x: Math.random() * W, y: Math.random() * H, v: 8 + Math.random() * 30, r: .8 + Math.random() * 2.2, ph: Math.random() * 6.28 });
+            return true;
+        }
+        function frame(t) {
+            if (!locked()) { run = false; return; }
+            var dt = Math.min(.05, (t - last) / 1000); last = t;
+            var dark = document.documentElement.classList.contains('dark'), col = dark ? '255,225,140' : '170,125,28', fade = Math.min(1, (t - t0) / 1400), k = dark ? 1 : .75;
+            ctx.clearRect(0, 0, W, H);
+            for (var i = 0; i < P.length; i++) {
+                var p = P[i]; p.y -= p.v * dt; p.x += Math.sin(t * .0004 + p.ph) * .15;
+                if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
+                var tw = .5 + .5 * Math.sin(t * .0022 + p.ph), a = .6 * tw * fade * k;
+                ctx.fillStyle = 'rgba(' + col + ',' + (a / 5) + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 2.4, 0, 6.283); ctx.fill();
+                ctx.fillStyle = 'rgba(' + col + ',' + a + ')'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill();
+            }
+            requestAnimationFrame(frame);
+        }
+        function start() {
+            if (!locked()) return; if (!P.length || cv.clientWidth !== W || cv.clientHeight !== H) { if (!size()) return; }
+            if (!run) { run = true; t0 = last = performance.now(); requestAnimationFrame(frame); }
+        }
+        window.addEventListener('resize', function () { clearTimeout(size._t); size._t = setTimeout(function () { if (locked() && size()) start(); }, 150); });
+        new MutationObserver(start).observe(document.body, { attributes: true, attributeFilter: ['class'] });
         start();
     })();
     </script>
@@ -3451,7 +3753,7 @@ html.dark input,html.dark select,html.dark textarea{color:#EFE3BE}
             if (ok) {
                 const store = document.getElementById('lg-remember').checked ? localStorage : sessionStorage;
                 try { store.setItem('sikma_auth', PW_HASH); } catch (e) {}
-                document.getElementById('lg-btn-text').innerText = 'Berhasil…'; if (window.lgSwarm) lgSwarm.gather();
+                document.getElementById('lg-btn-text').innerText = 'Berhasil…'; if (window.lgSwarm) lgSwarm.gather(); if (window.lgIntro) lgIntro.success();
                 const ls = document.getElementById('login-screen');
                 ls.classList.add('lg-out');
                 setTimeout(() => { unlockApp(); ls.classList.remove('lg-out'); inp.value = ''; btn.disabled = false; document.getElementById('lg-btn-text').innerText = 'Masuk'; }, 450);
