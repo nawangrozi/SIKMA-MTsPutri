@@ -702,6 +702,83 @@ html #login-screen .lg-card h2{background:linear-gradient(100deg,#B8892B,#F0D58A
 html:not(.dark) #login-screen .lg-card h2{background:linear-gradient(100deg,#8A6414,#C9A24A 50%,#9C7220);-webkit-background-clip:text;background-clip:text}
 @media (prefers-reduced-motion:reduce){.lg-rays i,.lg-halo,.lg-badge,.lg-logo.has-mask::after{animation:none!important}#lg-dust{display:none}}
 </style>
+<style id="v9">
+        /* ===== grafik latar hero & periode: muncul kiri ke kanan, lalu terus bergerak ===== */
+        #view-beranda > div:first-child > .hero-bgchart, #periode-bar > .pb-bgchart {
+            position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible;
+            clip-path: inset(0 100% 0 0); animation: bgcWipe 1.8s cubic-bezier(.5,0,.2,1) .1s forwards; }
+        .hero-bgchart { color: #F6E7B4; }
+        .pb-bgchart { color: #0A7A5A; }
+        html.dark .pb-bgchart { color: #6EE7B7; }
+        .bgc-bar { fill: currentColor; fill-opacity: .22; transform-box: fill-box; transform-origin: 50% 100%;
+            animation: bgcBeat 3.2s ease-in-out infinite; }
+        .bgc-area { opacity: 0; animation: bgcFade 1.2s ease 1s forwards; }
+        .bgc-line { fill: none; stroke: currentColor; stroke-opacity: .55; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+        .bgc-flow { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: .14 .86; stroke-dashoffset: 1; filter: drop-shadow(0 0 6px currentColor);
+            animation: bgcFlow 3.4s linear infinite; }
+        @keyframes bgcWipe { to { clip-path: inset(0 0 0 0); } }
+        @keyframes bgcBeat { 0%,100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+        @keyframes bgcFade { to { opacity: 1; } }
+        @keyframes bgcFlow { from { stroke-dashoffset: 1; } to { stroke-dashoffset: -1; } }
+        @media (prefers-reduced-motion: reduce) {
+            .hero-bgchart, .pb-bgchart, .bgc-bar, .bgc-area, .bgc-flow { animation: none !important; clip-path: none; }
+            .bgc-area { opacity: 1; } .bgc-bar { transform: scaleY(.7); } .bgc-flow { display: none; } }
+
+        /* latar batik Solo (motif Kawung), terang & gelap */
+        body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background-image: radial-gradient(900px 600px at 15% 10%, rgba(230,195,106,.14), transparent 60%), radial-gradient(900px 700px at 90% 100%, rgba(16,185,129,.13), transparent 60%), url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><g fill='%23E6C36A' fill-opacity='0.11' stroke='%23E6C36A' stroke-opacity='0.22' stroke-width='1.1'><ellipse cx='48' cy='48' rx='24' ry='9' transform='rotate(45 48 48)'/><ellipse cx='48' cy='48' rx='24' ry='9' transform='rotate(-45 48 48)'/><circle cx='0' cy='0' r='11'/><circle cx='96' cy='0' r='11'/><circle cx='0' cy='96' r='11'/><circle cx='96' cy='96' r='11'/></g><g fill='%23E6C36A' fill-opacity='0.22'><circle cx='48' cy='48' r='3'/><circle cx='48' cy='0' r='2'/><circle cx='0' cy='48' r='2'/><circle cx='96' cy='48' r='2'/><circle cx='48' cy='96' r='2'/></g></svg>");
+            background-size: 100% 100%, 100% 100%, 96px 96px;
+            animation: motifDrift 80s linear infinite; }
+        html:not(.dark) body::before {
+            background-image: radial-gradient(900px 600px at 15% 10%, rgba(201,162,74,.2), transparent 60%), radial-gradient(900px 700px at 90% 100%, rgba(18,128,90,.15), transparent 60%), url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><g fill='%239C7220' fill-opacity='0.13' stroke='%239C7220' stroke-opacity='0.26' stroke-width='1.1'><ellipse cx='48' cy='48' rx='24' ry='9' transform='rotate(45 48 48)'/><ellipse cx='48' cy='48' rx='24' ry='9' transform='rotate(-45 48 48)'/><circle cx='0' cy='0' r='11'/><circle cx='96' cy='0' r='11'/><circle cx='0' cy='96' r='11'/><circle cx='96' cy='96' r='11'/></g><g fill='%239C7220' fill-opacity='0.26'><circle cx='48' cy='48' r='3'/><circle cx='48' cy='0' r='2'/><circle cx='0' cy='48' r='2'/><circle cx='96' cy='48' r='2'/><circle cx='48' cy='96' r='2'/></g></svg>"); }
+        @keyframes motifDrift { from { background-position: 0 0, 0 0, 0 0; } to { background-position: 0 0, 0 0, 96px 96px; } }
+        @media (prefers-reduced-motion: reduce) { body::before { animation: none; } }
+</style>
+<style id="print-laporan">
+        /* ===== cetak laporan keuangan: rapi, hanya dokumen, menyesuaikan A4 ===== */
+        @media print {
+            @page { size: A4 portrait; margin: 14mm 14mm; }
+            html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
+            body > div, body > div > div { height: auto !important; overflow: visible !important; display: block !important; }
+            #sidebar, #sidebar-overlay, header.hdr, #periode-bar, #toast, #confirm-box, .theme-toggle { display: none !important; }
+            main { overflow: visible !important; height: auto !important; padding: 0 !important; background: #fff !important; }
+            #view-laporan .no-print { display: none !important; }
+            #view-laporan > div { box-shadow: none !important; border: 0 !important; padding: 0 !important; background: #fff !important; }
+            #laporan-preview-container { border: 0 !important; box-shadow: none !important; padding: 0 !important; width: 100% !important;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #laporan-preview-container * { overflow: visible !important; }
+            #rep-content-body { overflow: visible !important; }
+            #rep-content-body table { width: 100% !important; min-width: 0 !important; font-size: 11px !important; border-collapse: collapse; }
+            #rep-content-body table th, #rep-content-body table td { padding: 4px 6px !important; }
+            #rep-content-body thead { display: table-header-group; }
+            #rep-content-body tr { page-break-inside: avoid; }
+            #laporan-preview-container .grid { page-break-inside: avoid; }
+            #laporan-preview-container .text-center.border-b { page-break-after: avoid; }
+            #view-laporan .bg-white { background: #fff !important; }
+        }
+</style>
+<style id="print-warna">
+        /* ===== warna cetak laporan: teks gelap dan jelas di kertas putih ===== */
+        @media print {
+            #laporan-preview-container, #laporan-preview-container * { color: #111 !important; text-shadow: none !important; }
+            #laporan-preview-container .text-emerald-700, #laporan-preview-container .text-emeraldDeep { color: #065F46 !important; }
+            #laporan-preview-container .text-red-600 { color: #B91C1C !important; }
+            #laporan-preview-container .text-champagneGold { color: #8A6418 !important; }
+            #laporan-preview-container .text-gray-600, #laporan-preview-container .text-gray-500 { color: #4B5563 !important; }
+            #laporan-preview-container table, #laporan-preview-container th, #laporan-preview-container td { border-color: #9CA3AF !important; }
+            #laporan-preview-container tr.bg-gray-100, #laporan-preview-container thead tr { background: #E5E7EB !important; }
+            #laporan-preview-container tr.bg-gray-50 { background: #F3F4F6 !important; }
+        }
+</style>
+<style id="print-tampil">
+        /* ===== pastikan laporan selalu tampil penuh saat dicetak (tanpa animasi transparan) ===== */
+        @media print {
+            #view-laporan, #view-laporan *, main, main *, #laporan-preview-container, #laporan-preview-container * {
+                animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; visibility: visible !important; }
+            #view-laporan.hidden { display: none !important; }
+        }
+</style>
 </head>
 
 <body class="flex h-screen overflow-hidden">
@@ -1139,9 +1216,8 @@ var stimers = [];
             
             <!-- BAR PERIODE -->
             <div id="periode-bar" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3">
+<svg class="pb-bgchart" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="bgcArea-pb-bgchart" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".4"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs><g class="bgc-bars"><rect class="bgc-bar" style="--d:0.00s" x="12.0" y="166" width="18" height="34" rx="3"/><rect class="bgc-bar" style="--d:2.37s" x="53.6" y="148" width="18" height="52" rx="3"/><rect class="bgc-bar" style="--d:2.14s" x="95.2" y="172" width="18" height="28" rx="3"/><rect class="bgc-bar" style="--d:1.91s" x="136.8" y="136" width="18" height="64" rx="3"/><rect class="bgc-bar" style="--d:1.68s" x="178.4" y="154" width="18" height="46" rx="3"/><rect class="bgc-bar" style="--d:1.45s" x="220.0" y="130" width="18" height="70" rx="3"/><rect class="bgc-bar" style="--d:1.22s" x="261.6" y="160" width="18" height="40" rx="3"/><rect class="bgc-bar" style="--d:0.99s" x="303.2" y="142" width="18" height="58" rx="3"/><rect class="bgc-bar" style="--d:0.76s" x="344.8" y="168" width="18" height="32" rx="3"/><rect class="bgc-bar" style="--d:0.53s" x="386.4" y="124" width="18" height="76" rx="3"/><rect class="bgc-bar" style="--d:0.30s" x="428.0" y="150" width="18" height="50" rx="3"/><rect class="bgc-bar" style="--d:0.07s" x="469.6" y="112" width="18" height="88" rx="3"/><rect class="bgc-bar" style="--d:2.44s" x="511.2" y="156" width="18" height="44" rx="3"/><rect class="bgc-bar" style="--d:2.21s" x="552.8" y="138" width="18" height="62" rx="3"/><rect class="bgc-bar" style="--d:1.98s" x="594.4" y="164" width="18" height="36" rx="3"/><rect class="bgc-bar" style="--d:1.75s" x="636.0" y="128" width="18" height="72" rx="3"/><rect class="bgc-bar" style="--d:1.52s" x="677.6" y="146" width="18" height="54" rx="3"/><rect class="bgc-bar" style="--d:1.29s" x="719.2" y="160" width="18" height="40" rx="3"/><rect class="bgc-bar" style="--d:1.06s" x="760.8" y="134" width="18" height="66" rx="3"/><rect class="bgc-bar" style="--d:0.83s" x="802.4" y="170" width="18" height="30" rx="3"/><rect class="bgc-bar" style="--d:0.60s" x="844.0" y="142" width="18" height="58" rx="3"/><rect class="bgc-bar" style="--d:0.37s" x="885.6" y="154" width="18" height="46" rx="3"/><rect class="bgc-bar" style="--d:0.14s" x="927.2" y="120" width="18" height="80" rx="3"/><rect class="bgc-bar" style="--d:2.51s" x="968.8" y="162" width="18" height="38" rx="3"/></g><path class="bgc-area" d="M0,150 C45.0,150 45.0,142 90,142 C130.0,142 130.0,118 170,118 C210.0,118 210.0,128 250,128 C290.0,128 290.0,104 330,104 C375.0,104 375.0,92 420,92 C460.0,92 460.0,100 500,100 C540.0,100 540.0,128 580,128 C620.0,128 620.0,118 660,118 C700.0,118 700.0,96 740,96 C780.0,96 780.0,62 820,62 C860.0,62 860.0,48 900,48 C950.0,48 950.0,26 1000,26 L1000,200 L0,200 Z" fill="url(#bgcArea-pb-bgchart)"/><path class="bgc-line" d="M0,150 C45.0,150 45.0,142 90,142 C130.0,142 130.0,118 170,118 C210.0,118 210.0,128 250,128 C290.0,128 290.0,104 330,104 C375.0,104 375.0,92 420,92 C460.0,92 460.0,100 500,100 C540.0,100 540.0,128 580,128 C620.0,128 620.0,118 660,118 C700.0,118 700.0,96 740,96 C780.0,96 780.0,62 820,62 C860.0,62 860.0,48 900,48 C950.0,48 950.0,26 1000,26"/><path class="bgc-flow" pathLength="1" d="M0,150 C45.0,150 45.0,142 90,142 C130.0,142 130.0,118 170,118 C210.0,118 210.0,128 250,128 C290.0,128 290.0,104 330,104 C375.0,104 375.0,92 420,92 C460.0,92 460.0,100 500,100 C540.0,100 540.0,128 580,128 C620.0,128 620.0,118 660,118 C700.0,118 700.0,96 740,96 C780.0,96 780.0,62 820,62 C860.0,62 860.0,48 900,48 C950.0,48 950.0,26 1000,26"/></svg>
                 <!-- animasi roda (sama seperti hero Beranda) -->
-                <div class="pb-roller big" aria-hidden="true"><div class="hero-disc"></div></div>
-                <div class="pb-roller small" aria-hidden="true"><div class="hero-disc"></div></div>
                 <div class="pb-fields flex flex-wrap items-center gap-2.5">
                     <span class="pb-title text-xs font-bold text-emeraldDeep uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="calendar-range" class="w-4 h-4"></i><span>Periode Data</span></span>
                     <select id="periode-ta" onchange="setPeriode()" class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none"></select>
@@ -1163,8 +1239,7 @@ var stimers = [];
             <!-- VIEW 1: BERANDA -->
             <section id="view-beranda" class="view-section space-y-6 fade-in">
                 <div class="bg-gradient-to-r from-emeraldDeep to-forestGreen rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div class="hero-roller big" aria-hidden="true"><div class="hero-disc"></div></div>
-                    <div class="hero-roller small" aria-hidden="true"><div class="hero-disc"></div></div>
+<svg class="hero-bgchart" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="bgcArea-hero-bgchart" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".4"/><stop offset="1" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs><g class="bgc-bars"><rect class="bgc-bar" style="--d:0.00s" x="12.0" y="166" width="18" height="34" rx="3"/><rect class="bgc-bar" style="--d:2.37s" x="53.6" y="148" width="18" height="52" rx="3"/><rect class="bgc-bar" style="--d:2.14s" x="95.2" y="172" width="18" height="28" rx="3"/><rect class="bgc-bar" style="--d:1.91s" x="136.8" y="136" width="18" height="64" rx="3"/><rect class="bgc-bar" style="--d:1.68s" x="178.4" y="154" width="18" height="46" rx="3"/><rect class="bgc-bar" style="--d:1.45s" x="220.0" y="130" width="18" height="70" rx="3"/><rect class="bgc-bar" style="--d:1.22s" x="261.6" y="160" width="18" height="40" rx="3"/><rect class="bgc-bar" style="--d:0.99s" x="303.2" y="142" width="18" height="58" rx="3"/><rect class="bgc-bar" style="--d:0.76s" x="344.8" y="168" width="18" height="32" rx="3"/><rect class="bgc-bar" style="--d:0.53s" x="386.4" y="124" width="18" height="76" rx="3"/><rect class="bgc-bar" style="--d:0.30s" x="428.0" y="150" width="18" height="50" rx="3"/><rect class="bgc-bar" style="--d:0.07s" x="469.6" y="112" width="18" height="88" rx="3"/><rect class="bgc-bar" style="--d:2.44s" x="511.2" y="156" width="18" height="44" rx="3"/><rect class="bgc-bar" style="--d:2.21s" x="552.8" y="138" width="18" height="62" rx="3"/><rect class="bgc-bar" style="--d:1.98s" x="594.4" y="164" width="18" height="36" rx="3"/><rect class="bgc-bar" style="--d:1.75s" x="636.0" y="128" width="18" height="72" rx="3"/><rect class="bgc-bar" style="--d:1.52s" x="677.6" y="146" width="18" height="54" rx="3"/><rect class="bgc-bar" style="--d:1.29s" x="719.2" y="160" width="18" height="40" rx="3"/><rect class="bgc-bar" style="--d:1.06s" x="760.8" y="134" width="18" height="66" rx="3"/><rect class="bgc-bar" style="--d:0.83s" x="802.4" y="170" width="18" height="30" rx="3"/><rect class="bgc-bar" style="--d:0.60s" x="844.0" y="142" width="18" height="58" rx="3"/><rect class="bgc-bar" style="--d:0.37s" x="885.6" y="154" width="18" height="46" rx="3"/><rect class="bgc-bar" style="--d:0.14s" x="927.2" y="120" width="18" height="80" rx="3"/><rect class="bgc-bar" style="--d:2.51s" x="968.8" y="162" width="18" height="38" rx="3"/></g><path class="bgc-area" d="M0,150 C45.0,150 45.0,142 90,142 C130.0,142 130.0,118 170,118 C210.0,118 210.0,128 250,128 C290.0,128 290.0,104 330,104 C375.0,104 375.0,92 420,92 C460.0,92 460.0,100 500,100 C540.0,100 540.0,128 580,128 C620.0,128 620.0,118 660,118 C700.0,118 700.0,96 740,96 C780.0,96 780.0,62 820,62 C860.0,62 860.0,48 900,48 C950.0,48 950.0,26 1000,26 L1000,200 L0,200 Z" fill="url(#bgcArea-hero-bgchart)"/><path class="bgc-line" d="M0,150 C45.0,150 45.0,142 90,142 C130.0,142 130.0,118 170,118 C210.0,118 210.0,128 250,128 C290.0,128 290.0,104 330,104 C375.0,104 375.0,92 420,92 C460.0,92 460.0,100 500,100 C540.0,100 540.0,128 580,128 C620.0,128 620.0,118 660,118 C700.0,118 700.0,96 740,96 C780.0,96 780.0,62 820,62 C860.0,62 860.0,48 900,48 C950.0,48 950.0,26 1000,26"/><path class="bgc-flow" pathLength="1" d="M0,150 C45.0,150 45.0,142 90,142 C130.0,142 130.0,118 170,118 C210.0,118 210.0,128 250,128 C290.0,128 290.0,104 330,104 C375.0,104 375.0,92 420,92 C460.0,92 460.0,100 500,100 C540.0,100 540.0,128 580,128 C620.0,128 620.0,118 660,118 C700.0,118 700.0,96 740,96 C780.0,96 780.0,62 820,62 C860.0,62 860.0,48 900,48 C950.0,48 950.0,26 1000,26"/></svg>
                     <div class="flex items-center gap-5 relative z-10">
                         <div id="logo-hero-box" class="hidden w-24 h-24 shrink-0"><img id="logo-hero" alt="Logo Lembaga" class="w-full h-full object-contain" style="filter: drop-shadow(0 6px 14px rgba(0,0,0,.4))"></div>
                     <div>
@@ -1554,7 +1629,7 @@ var stimers = [];
             <!-- VIEW 4: LAPORAN KEUANGAN -->
             <section id="view-laporan" class="view-section space-y-6 hidden fade-in">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-b pb-4">
+                    <div class="no-print flex flex-col sm:flex-row justify-between items-center gap-4 border-b pb-4">
                         <div>
                             <h3 class="text-lg font-bold text-darkText">Laporan Keuangan Madrasah Komprehensif</h3>
                             <p class="text-xs text-mutedText">Pilih jenis laporan dan cetak dokumen resmi berstandar administratif.</p>
@@ -1593,8 +1668,8 @@ var stimers = [];
                         </div>
                     </div>
 
-                    <div class="flex justify-end space-x-3">
-                        <button onclick="window.print()" class="bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-900 shadow transition flex items-center space-x-2">
+                    <div class="no-print flex justify-end space-x-3">
+                        <button onclick="printLaporanDoc()" class="bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-900 shadow transition flex items-center space-x-2">
                             <i data-lucide="printer" class="w-4 h-4"></i>
                             <span>Cetak Langsung</span>
                         </button>
@@ -4271,5 +4346,48 @@ var stimers = [];
         showToast('File Excel RKAM berhasil diunduh!');
     }
     </script>
+
+<script>
+/* Cetak Langsung laporan: cetak hanya dokumen laporan dalam dokumen terpisah yang bersih */
+function printLaporanDoc() {
+    const src = document.getElementById('laporan-preview-container');
+    if (!src) { window.print(); return; }
+    const html = '<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><title>Laporan Keuangan</title>' +
+        '<script src="https://cdn.tailwindcss.com"><\/script>' +
+        '<style>' +
+        '@page { size: A4 portrait; margin: 14mm; }' +
+        'html, body { background: #fff; color: #111; margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; }' +
+        '*, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }' +
+        '#laporan-preview-container { border: 0 !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; background: #fff !important; }' +
+        '.text-emerald-700, .text-emeraldDeep { color: #065F46 !important; }' +
+        '.text-red-600 { color: #B91C1C !important; }' +
+        '.text-champagneGold { color: #8A6418 !important; }' +
+        '.text-gray-600, .text-gray-500 { color: #4B5563 !important; }' +
+        'table { border-collapse: collapse; width: 100%; }' +
+        'th, td { border: 1px solid #9CA3AF; padding: 4px 6px; }' +
+        'tr.bg-gray-100, thead tr { background: #E5E7EB !important; }' +
+        'tr.bg-gray-50 { background: #F3F4F6 !important; }' +
+        'tr, .grid { page-break-inside: avoid; }' +
+        '</style></head><body>' + src.outerHTML + '</body></html>';
+
+    const frame = document.createElement('iframe');
+    frame.setAttribute('aria-hidden', 'true');
+    frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;opacity:0;pointer-events:none;';
+    document.body.appendChild(frame);
+    const doc = frame.contentDocument || frame.contentWindow.document;
+    doc.open(); doc.write(html); doc.close();
+
+    let done = false;
+    const go = () => {
+        if (done) return; done = true;
+        setTimeout(() => {
+            try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) { window.print(); }
+            setTimeout(() => frame.remove(), 1500);
+        }, 600);
+    };
+    frame.contentWindow.addEventListener('load', go);
+    setTimeout(go, 2500);
+}
+</script>
 </body>
 </html>
