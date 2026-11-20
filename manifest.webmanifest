@@ -1,0 +1,19 @@
+{
+  "name": "SIKMA - Sistem Informasi Keuangan MTs Putri Hikmatusysyarief",
+  "short_name": "SIKMA",
+  "description": "Sistem Informasi Keuangan Madrasah MTs Putri Hikmatusysyarief NWDI Salut",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#064E3B",
+  "theme_color": "#064E3B",
+  "lang": "id",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
